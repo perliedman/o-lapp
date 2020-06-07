@@ -8,17 +8,19 @@ import { firebaseConfig } from '../config'
 firebase.initializeApp(firebaseConfig)
 firebase.analytics()
 
-const database = firebase.database()
-
-const initialState = {}
+const initialState = {
+  database: firebase.database()
+}
 
 const store = createContext(initialState)
 const { Provider } = store
 
 const StateProvider = ( {children} ) => {
-  const [state, dispatch] = useReducer(reducer)
+  const [state, dispatch] = useReducer(reducer, initialState)
 
-  return <Provider value={{ state, dispatch }}>{children}</Provider>
+  return <Provider value={{ state, dispatch }}>
+    {children}
+  </Provider>
 }
 
 export { store, StateProvider }

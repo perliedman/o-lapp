@@ -7,7 +7,7 @@ function App() {
   return (
     <StateProvider>
       <div className="App">
-        <Event groupId="IpVEumfgNDNiKI4Ln2Qo" eventId="T0HXko7ZyGYs0GVxvE8u" />
+        <Event eventId="T0HXko7ZyGYs0GVxvE8u" />
       </div>
     </StateProvider>
   );

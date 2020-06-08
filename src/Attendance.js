@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import Query from './Query'
 import { store } from './store'
 
@@ -23,20 +23,39 @@ export default function Attendance({groupId, eventId}) {
 }
 
 function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
+  const [mode, setMode] = useState('attendance')
+  const sortedMembers = useMemo(() => {
+    const byName = (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+    const byReturned = (a, b) => a.returned && !b.returned ? -1 : b.returned && !a.returned ? 1 : byName(a, b)
+
+    return members.sort(mode === 'attendance'
+      ? byName
+      : byReturned)
+  }, [members, mode])
   const state = reduceAttendanceEvents(memberKeys, attendance)
 
-  return <table>
-    <thead>
-      <tr>
-        <th>Namn</th>
-        <th>Närvarande</th>
-        <th>Tillbaka</th>
-      </tr>
-    </thead>
-    <tbody>
-      {members.map((m, i) => <AttendanceRow key={memberKeys[i]} member={m} memberKey={memberKeys[i]} state={state[memberKeys[i]]} dispatch={dispatch} />)}
-    </tbody>
-  </table>
+  return <>
+    <div className="tabs">
+      <ul>
+        {[['Närvaro', 'attendance'], ['Kvar i skogen', 'not_returned']].map(([label, m]) =>
+          <li key={m} className={m === mode ? 'is-active' : ''}>
+            <a href="#" onClick={() => setMode(m)}>{label}</a>
+          </li>)}
+      </ul>
+    </div>
+    <table className="table is-striped is-fullwidth">
+      <thead>
+        <tr>
+          <th>Namn</th>
+          <th>Närvarande</th>
+          <th>Tillbaka</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedMembers.map((m, i) => <AttendanceRow key={memberKeys[i]} member={m} memberKey={memberKeys[i]} state={state[memberKeys[i]]} dispatch={dispatch} />)}
+      </tbody>
+    </table>
+  </>
 }
 
 function AttendanceRow({ member, memberKey, state, dispatch }) {

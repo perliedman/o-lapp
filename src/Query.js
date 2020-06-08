@@ -35,7 +35,7 @@ export default function Query({ path, children, join, acceptEmpty }) {
   }, [database, path, join])
 
   return state === 'loading'
-    ? "Loading..."
+    ? <progress className="progress is-small is-primary" />
     : !value
     ? (!acceptEmpty
       ? 'Not found :('

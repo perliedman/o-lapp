@@ -26,6 +26,13 @@ function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
   const state = reduceAttendanceEvents(memberKeys, attendance)
 
   return <table>
+    <thead>
+      <tr>
+        <th>Namn</th>
+        <th>Närvarande</th>
+        <th>Tillbaka</th>
+      </tr>
+    </thead>
     <tbody>
       {members.map((m, i) => <AttendanceRow key={memberKeys[i]} member={m} memberKey={memberKeys[i]} state={state[memberKeys[i]]} dispatch={dispatch} />)}
     </tbody>

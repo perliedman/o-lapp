@@ -35,11 +35,14 @@ function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
   const state = reduceAttendanceEvents(memberKeys, attendance)
 
   return <>
-    <div className="tabs">
+    <div className="tabs is-toggle">
       <ul>
         {[['Närvaro', 'attendance'], ['Kvar i skogen', 'not_returned']].map(([label, m]) =>
           <li key={m} className={m === mode ? 'is-active' : ''}>
-            <a href="#" onClick={() => setMode(m)}>{label}</a>
+            <a href="#" onClick={e => {
+              e.preventDefault()
+              setMode(m)
+            }}>{label}</a>
           </li>)}
       </ul>
     </div>
@@ -52,14 +55,20 @@ function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
         </tr>
       </thead>
       <tbody>
-        {sortedMembers.map((m, i) => <AttendanceRow key={memberKeys[i]} member={m} memberKey={memberKeys[i]} state={state[memberKeys[i]]} dispatch={dispatch} />)}
+        {sortedMembers.map((m, i) => <AttendanceRow
+          key={memberKeys[i]}
+          member={m}
+          memberKey={memberKeys[i]}
+          state={state[memberKeys[i]]}
+          mode={mode}
+          dispatch={dispatch} />)}
       </tbody>
     </table>
   </>
 }
 
-function AttendanceRow({ member, memberKey, state, dispatch }) {
-  return <tr>
+function AttendanceRow({ member, memberKey, state, mode, dispatch }) {
+  return <tr style={mode === 'not_returned' && state.returned ? { opacity: 0.4 } : {}}>
     <td>{member.name}</td>
     <td>
       <input type="checkbox" checked={state.attending} onChange={e => dispatch(e.target.checked ? 'ADD_ATTENDANCE' : 'REMOVE_ATTENDANCE', memberKey)} />

@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 
+import { store } from './store'
+
 export default function Navbar () {
+  const { state: { user } } = useContext(store)
+
   return <nav className="navbar is-info is-spaced" role="navigation" aria-label="main navigation">
     <div className="navbar-brand">
       <Link className="navbar-item" to="/">
@@ -25,12 +29,11 @@ export default function Navbar () {
       <div className="navbar-end">
         <div className="navbar-item">
           <div className="buttons">
-            <a className="button is-success">
-              <strong>Registrera dig</strong>
-            </a>
-            <a className="button is-light">
-              Logga in
-            </a>
+            {user 
+              ? <p>Inloggad som <strong>{user.email}</strong></p>
+              : <Link className="button is-success" to="/signin">
+                <strong>Logga In</strong>
+              </Link>}
           </div>
         </div>
       </div>

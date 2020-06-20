@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  Redirect
 } from 'react-router-dom'
 import { StateProvider, store } from './store';
 import Navbar from './Navbar'
@@ -15,6 +16,7 @@ import Events from './Events';
 
 import firebase from 'firebase'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
+import Breadcrumbs from './breadcrumbs';
 
 function App() {
   return (
@@ -26,7 +28,8 @@ function App() {
           <div className="container">
             <Switch>
               <Route path="/event/:eventId" component={EventView} />
-              <Route path="/group/:groupId" component={EventsView} />
+              <Route path="/group/:groupId/event/new" component={NewEvent} />
+              <Route path="/group/:groupId" component={GroupView} />
               <Route path="/signin" component={SignIn} />
               <Route path="/" component={StartView} />
             </Switch>
@@ -44,12 +47,10 @@ function StartView () {
     ? <Query path={`/users/${user.uid}/groups`} join={groupId => `/groups/${groupId}`}>
       {groups => {
         const groupIds = Object.keys(groups)
+
         return groupIds.length > 1
           ? <GroupsView groups={groups} />
-          : <>
-            <h2>{groups[groupIds[0]].name}</h2>
-            <Events group={groups[groupIds[0]]} groupId={groupIds[0]} />
-          </>}}
+          : <Redirect to={`/group/${groupIds[0]}`} />}}
       </Query>
     : <section className="section">
       <p>
@@ -65,6 +66,16 @@ function StartView () {
 
 function GroupsView () {
   return null
+}
+
+function GroupView({ match: { params: { groupId } } }) {
+  return <Query path={`/groups/${groupId}`}>
+    {group => <>
+      <h2>{group.name}</h2>
+      <Events group={group} groupId={groupId} />
+      <Link to={`/group/${groupId}/event/new`} className="button is-primary">+ Nytt tillfälle</Link>
+    </>}
+  </Query>
 }
 
 function EventsView({ match: { params: { groupId } } }) {
@@ -87,6 +98,54 @@ function SignIn () {
   }
 
   return <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+}
+
+function NewEvent({ match: { params: {groupId} } }) {
+  const { state: { database } } = useContext(store)
+
+  const [eventName, setEventName] = useState('')
+  const [eventDate, setEventDate] = useState('')
+
+  return <Query path={`/groups/${groupId}`}>
+    {group => <>
+      <Breadcrumbs crumbs={[
+        [`/group/${groupId}`, group.name],
+        [`/group/${groupId}/event/new`, 'Nytt tillfälle']
+      ]} />
+      <form onSubmit={onSubmit}>
+        <div className="field">
+          <label className="label">Namn</label>
+          <input className="input" type="text" placeholder="Tillfällets namn" value={eventName} onChange={e => setEventName(e.target.value)} />
+        </div>
+        <div className="field">
+          <label className="label">Datum</label>
+          <input className="input" type="date" placeholder="Datum" value={eventDate} onChange={e => setEventDate(e.target.value)} />
+        </div>
+        <div className="field is-grouped">
+          <div className="control">
+            <button type="submit" className="button is-link" disabled={!eventName || !eventDate}>Spara</button>
+          </div>
+          <div className="control">
+            <Link to={`/group/${groupId}`} className="button is-link is-light">Avbryt</Link>
+          </div>
+        </div>
+      </form>
+    </>}
+  </Query>
+
+  function onSubmit (event) {
+    event.preventDefault()
+
+    const eventsRef = database.ref(`/events`)
+    const eventRef = eventsRef.push()
+    eventRef.set({
+      name: eventName,
+      date: eventDate,
+      groupId
+    })
+    const groupEventRef = database.ref(`/groups/${groupId}/events/${eventRef.key}`)
+    groupEventRef.set(true)
+  }
 }
 
 export default App;

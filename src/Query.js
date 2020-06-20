@@ -20,11 +20,11 @@ export default function Query({ path, children, join, acceptEmpty }) {
       })
 
     } else {
-      setValue([])
+      setValue({})
       ref.on('child_added', snapshot => {
         const joinRef = database.ref(join(snapshot.key))
         joinRef.once('value', joinSnapshot => {
-          setValue((value || []).concat([joinSnapshot.val()]))
+          setValue({ ...value, [joinSnapshot.key]: joinSnapshot.val() })
           setKey((key || []).concat(joinSnapshot.key))
           setState('idle')
         })

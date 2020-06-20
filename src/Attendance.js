@@ -28,7 +28,7 @@ function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
     const byName = (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0
     const byReturned = (a, b) => a.returned && !b.returned ? -1 : b.returned && !a.returned ? 1 : byName(a, b)
 
-    return members.sort(mode === 'attendance'
+    return Object.values(members).sort(mode === 'attendance'
       ? byName
       : byReturned)
   }, [members, mode])

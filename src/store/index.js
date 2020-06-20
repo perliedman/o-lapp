@@ -24,6 +24,8 @@ const StateProvider = ( {children} ) => {
     state.auth.onAuthStateChanged(user => {
       if (user) {
         dispatch({ type: 'USER_SIGNED_IN', user })
+      } else {
+        dispatch({ type: 'USER_SIGNED_OUT' })
       }
     })
   }, [state.auth])
@@ -41,6 +43,11 @@ function reducer(state, action) {
       return {
         ...state,
         user: action.user
+      }
+    case 'USER_SIGNED_OUT':
+      return {
+        ...state,
+        user: undefined
       }
     default:
       throw new Error(`Unknown action ${action.type}`)

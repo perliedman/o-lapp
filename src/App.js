@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link
 } from 'react-router-dom'
-import { StateProvider } from './store';
+import { StateProvider, store } from './store';
 import Navbar from './Navbar'
 import Event from './Event';
 
@@ -38,13 +38,29 @@ function App() {
 }
 
 function StartView () {
-  return <Query path="/groups">
-    {groups => {
-      const groupIds = Object.keys(groups)
-      return groupIds.length > 1
-        ? <GroupsView groups={groups} />
-        : <Events group={groups[groupIds[0]]} groupId={groupIds[0]} />}}
-  </Query>
+  const { state: { user } } = useContext(store)
+
+  return user
+    ? <Query path={`/users/${user.uid}/groups`} join={groupId => `/groups/${groupId}`}>
+      {groups => {
+        const groupIds = Object.keys(groups)
+        return groupIds.length > 1
+          ? <GroupsView groups={groups} />
+          : <>
+            <h2>{groups[groupIds[0]].name}</h2>
+            <Events group={groups[groupIds[0]]} groupId={groupIds[0]} />
+          </>}}
+      </Query>
+    : <section className="section">
+      <p>
+        Logga in för att hantera närvaro. Första gången du loggar in behöver du registrera din användare.
+      </p>
+      <p>
+        <Link className="button is-success" to="/signin">
+          <strong>Logga In</strong>
+        </Link>
+      </p>
+    </section>
 }
 
 function GroupsView () {

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { store } from './store'
 
 export default function Navbar () {
-  const { state: { user } } = useContext(store)
+  const { state: { user, auth } } = useContext(store)
 
   return <nav className="navbar is-info is-spaced" role="navigation" aria-label="main navigation">
     <div className="navbar-brand">
@@ -22,18 +22,24 @@ export default function Navbar () {
       </a>
     </div>
 
-    <div id="navbarBasicExample" className="navbar-menu">
+    <div className="navbar-menu">
       <div className="navbar-start">
       </div>
 
       <div className="navbar-end">
+        {user && <div className="navbar-item has-dropdown is-hoverable">
+          <a className="navbar-link">
+            {user.email}
+          </a>
+          <div className="navbar-dropdown">
+            <a className="navbar-item" onClick={() => auth.signOut()}>Logga ut</a>
+          </div>
+        </div>}
         <div className="navbar-item">
           <div className="buttons">
-            {user 
-              ? <p>Inloggad som <strong>{user.email}</strong></p>
-              : <Link className="button is-success" to="/signin">
-                <strong>Logga In</strong>
-              </Link>}
+            {!user && <Link className="button is-success" to="/signin">
+              <strong>Logga In</strong>
+            </Link>}
           </div>
         </div>
       </div>

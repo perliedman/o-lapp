@@ -71,7 +71,7 @@ function GroupsView () {
 function GroupView({ match: { params: { groupId } } }) {
   return <Query path={`/groups/${groupId}`}>
     {group => <>
-      <h2>{group.name}</h2>
+      <Breadcrumbs crumbs={[[`/group/${groupId}`, group.name]]}>{group.name}</Breadcrumbs>
       <Events group={group} groupId={groupId} />
       <Link to={`/group/${groupId}/event/new`} className="button is-primary">+ Nytt tillfälle</Link>
     </>}

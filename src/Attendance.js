@@ -5,10 +5,19 @@ import { store } from './store'
 export default function Attendance({groupId, eventId}) {
   const { state: { database } } = useContext(store)
   const attendanceRef = useMemo(() => database.ref(`attendance/${eventId}`), [eventId, database])
-
+  const [selectedMember, setSelectedMember] = useState()
+ 
   return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>      
     {(members, memberKeys) =>  <Query path={`attendance/${eventId}`} acceptEmpty={true}>
-        {attendance => <AttendanceTable attendance={attendance || {}} members={members || {}} memberKeys={memberKeys || []} dispatch={dispatch} />}
+        {attendance => <>
+          <AttendanceTable
+            attendance={attendance || {}}
+            members={members || {}}
+            memberKeys={memberKeys || []}
+            dispatch={dispatch}
+            onMemberSelected={member => setSelectedMember(member)} />
+          {selectedMember && <MemberInfoModal member={selectedMember} onClose={() => setSelectedMember(null)} />}
+        </>}
     </Query>}
   </Query>
 
@@ -22,7 +31,7 @@ export default function Attendance({groupId, eventId}) {
   }
 }
 
-function AttendanceTable({ attendance, members, dispatch }) {
+function AttendanceTable({ attendance, members, dispatch, onMemberSelected }) {
   const memberKeys = Object.keys(members)
   const [mode, setMode] = useState('attendance')
   const state = reduceAttendanceEvents(memberKeys, attendance)
@@ -83,15 +92,16 @@ function AttendanceTable({ attendance, members, dispatch }) {
           memberKey={m.key}
           state={state[m.key]}
           mode={mode}
-          dispatch={dispatch} />)}
+          dispatch={dispatch}
+          onNameClicked={() => onMemberSelected && onMemberSelected(m)} />)}
       </tbody>
     </table>
   </>
 }
 
-function AttendanceRow({ member, memberKey, state, mode, dispatch }) {
+function AttendanceRow({ member, memberKey, state, mode, dispatch, onNameClicked }) {
   return <tr style={mode === 'not_returned' && (!state.attending || state.returned) ? { opacity: 0.4 } : {}}>
-    <td>{member.name}</td>
+    <td onClick={onNameClicked}>{member.name}</td>
     <td>
       <input type="checkbox" checked={state.attending} onChange={e => dispatch(e.target.checked ? 'ADD_ATTENDANCE' : 'REMOVE_ATTENDANCE', memberKey)} />
     </td>
@@ -99,6 +109,20 @@ function AttendanceRow({ member, memberKey, state, mode, dispatch }) {
       <input type="checkbox" checked={state.attending && state.returned} disabled={!state.attending} onChange={e => dispatch(e.target.checked ? 'NOTE_RETURNED' : 'UNDO_RETURNED', memberKey)} />
     </td>
   </tr>
+}
+
+function MemberInfoModal ({ member, onClose }) {
+  return <div className="modal is-active">
+    <div className="modal-background"></div>
+    <div className="modal-content">
+      <div className="box">
+        <h2>{member.name}</h2>
+        <p><a href={`tel:${member.phone}`}>{member.phone}</a></p>
+        <p><a href={`mailto:${member.email}`}>{member.email}</a></p>
+        <button className="modal-close is-large" aria-label="close" onClick={onClose}></button>
+      </div>
+    </div>
+  </div>
 }
 
 function reduceAttendanceEvents(memberKeys, attendance) {

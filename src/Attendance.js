@@ -52,6 +52,9 @@ function AttendanceTable({ attendance, members, dispatch }) {
       : byReturned)
   }, [members, mode, state])
 
+  const [nAttending, nNotReturned] = Object.values(state).reduce(([na, nnr], m) =>
+    [na + (m.attending ? 1 : 0), nnr + (m.attending && !m.returned ? 1 : 0)], [0, 0])
+
   return <>
     <div className="tabs is-toggle">
       <ul>
@@ -64,6 +67,7 @@ function AttendanceTable({ attendance, members, dispatch }) {
           </li>)}
       </ul>
     </div>
+    <p>{nAttending} närvarande, {nNotReturned} kvar i skogen</p>
     <table className="table is-striped is-fullwidth">
       <thead>
         <tr>

@@ -1,10 +1,11 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { store } from './store'
 
 export default function Navbar () {
   const { state: { user, auth } } = useContext(store)
+  const [menuOpen, setMenuOpen] = useState(false) 
 
   return <nav className="navbar is-info is-spaced" role="navigation" aria-label="main navigation">
     <div className="navbar-brand">
@@ -15,14 +16,14 @@ export default function Navbar () {
         </div>
       </Link>
 
-      <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+      <a role="button" className={`navbar-burger burger ${menuOpen ? 'is-active' : ''}`} aria-label="menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
       </a>
     </div>
 
-    <div className="navbar-menu">
+    <div className={`navbar-menu ${menuOpen ? 'is-active' : ''}`}>
       <div className="navbar-start">
       </div>
 

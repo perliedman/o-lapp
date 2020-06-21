@@ -50,7 +50,9 @@ function StartView () {
 
         return groupIds.length > 1
           ? <GroupsView groups={groups} />
-          : <Redirect to={`/group/${groupIds[0]}`} />}}
+          : groupIds.length === 1
+          ? <Redirect to={`/group/${groupIds[0]}`} />
+          : 'Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa dig med det!'}}
       </Query>
     : <section className="section">
       <p>
@@ -105,8 +107,9 @@ function NewEvent({ match: { params: {groupId} } }) {
 
   const [eventName, setEventName] = useState('')
   const [eventDate, setEventDate] = useState('')
+  const [redirect, setRedirect] = useState()
 
-  return <Query path={`/groups/${groupId}`}>
+  return redirect ? <Redirect to={redirect} /> : <Query path={`/groups/${groupId}`}>
     {group => <>
       <Breadcrumbs crumbs={[
         [`/group/${groupId}`, group.name],
@@ -138,13 +141,15 @@ function NewEvent({ match: { params: {groupId} } }) {
 
     const eventsRef = database.ref(`/events`)
     const eventRef = eventsRef.push()
-    eventRef.set({
+    const createEvent = eventRef.set({
       name: eventName,
       date: eventDate,
       groupId
     })
     const groupEventRef = database.ref(`/groups/${groupId}/events/${eventRef.key}`)
-    groupEventRef.set(true)
+    const setGroupEvent = groupEventRef.set(true)
+
+    Promise.all([createEvent, setGroupEvent]).then(() => setRedirect(`/group/${groupId}/event/${eventRef.key}`))
   }
 }
 

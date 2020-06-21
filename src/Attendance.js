@@ -8,7 +8,7 @@ export default function Attendance({groupId, eventId}) {
 
   return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>      
     {(members, memberKeys) =>  <Query path={`attendance/${eventId}`} acceptEmpty={true}>
-        {attendance => <AttendanceTable attendance={attendance} members={members} memberKeys={memberKeys} dispatch={dispatch} />}
+        {attendance => <AttendanceTable attendance={attendance || {}} members={members || {}} memberKeys={memberKeys || []} dispatch={dispatch} />}
     </Query>}
   </Query>
 
@@ -22,7 +22,7 @@ export default function Attendance({groupId, eventId}) {
   }
 }
 
-function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
+function AttendanceTable({ attendance, members, dispatch }) {
   const [mode, setMode] = useState('attendance')
   const sortedMembers = useMemo(() => {
     const byName = (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0
@@ -32,6 +32,7 @@ function AttendanceTable({ attendance, members, memberKeys, dispatch }) {
       ? byName
       : byReturned)
   }, [members, mode])
+  const memberKeys = Object.keys(members)
   const state = reduceAttendanceEvents(memberKeys, attendance)
 
   return <>

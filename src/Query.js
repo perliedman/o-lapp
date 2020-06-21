@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 import { store } from './store'
 
-export default function Query({ path, children, join, acceptEmpty }) {
+export default function Query({ path, children, join, acceptEmpty, empty }) {
   const [state, setState] = useState('idle')
   const [value, setValue] = useState()
   const [key, setKey] = useState()
@@ -23,6 +23,7 @@ export default function Query({ path, children, join, acceptEmpty }) {
 
     } else {
       setValue({})
+      ref.once('value', () => setState('idle'))
       ref.on('child_added', snapshot => {
         const joinRef = database.ref(join(snapshot.key))
         joinRef.once('value', joinSnapshot => {
@@ -41,7 +42,7 @@ export default function Query({ path, children, join, acceptEmpty }) {
     ? <progress className="progress is-small is-primary" />
     : !value
     ? (!acceptEmpty
-      ? 'Not found :('
+      ? empty || 'Här är det tomt än så länge!'
       : children(value, key))
     : children(value, key)
 }

@@ -1,6 +1,8 @@
 import React, { useContext, useMemo, useState } from 'react'
 import Query from './Query'
 import { store } from './store'
+import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Attendance({groupId, eventId}) {
   const { state: { database } } = useContext(store)
@@ -117,8 +119,8 @@ function MemberInfoModal ({ member, onClose }) {
     <div className="modal-content">
       <div className="box">
         <h2>{member.name}</h2>
-        <p><a href={`tel:${member.phone}`}>{member.phone}</a></p>
-        <p><a href={`mailto:${member.email}`}>{member.email}</a></p>
+        <p><FontAwesomeIcon icon={faPhone} />&nbsp;<a href={`tel:${member.phone}`}>{member.phone}</a></p>
+        <p><FontAwesomeIcon icon={faEnvelope} />&nbsp;<a href={`mailto:${member.email}`}>{member.email}</a></p>
         <button className="modal-close is-large" aria-label="close" onClick={onClose}></button>
       </div>
     </div>

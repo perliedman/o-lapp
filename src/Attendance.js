@@ -23,17 +23,34 @@ export default function Attendance({groupId, eventId}) {
 }
 
 function AttendanceTable({ attendance, members, dispatch }) {
+  const memberKeys = Object.keys(members)
   const [mode, setMode] = useState('attendance')
+  const state = reduceAttendanceEvents(memberKeys, attendance)
   const sortedMembers = useMemo(() => {
-    const byName = (a, b) => a.name > b.name ? 1 : b.name > a.name ? -1 : 0
-    const byReturned = (a, b) => a.returned && !b.returned ? -1 : b.returned && !a.returned ? 1 : byName(a, b)
+    const byName = (a, b) =>
+      a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+    const byReturned = (a, b) => {
+      const aState = state[a.key]
+      const bState = state[b.key]
 
-    return Object.values(members).sort(mode === 'attendance'
+      if (aState.attending && bState.attending) {
+        return !aState.returned && bState.returned
+          ? -1
+          : !bState.returned && aState.returned
+          ? 1
+          : byName(a, b)
+      } else if (aState.attending) {
+        return -1
+      } else if (bState.attending) {
+        return 1
+      } else {
+        return byName(a, b)
+      }
+    }
+    return Object.keys(members).map((key) => ({ ...members[key], key })).sort(mode === 'attendance'
       ? byName
       : byReturned)
-  }, [members, mode])
-  const memberKeys = Object.keys(members)
-  const state = reduceAttendanceEvents(memberKeys, attendance)
+  }, [members, mode, state])
 
   return <>
     <div className="tabs is-toggle">
@@ -57,10 +74,10 @@ function AttendanceTable({ attendance, members, dispatch }) {
       </thead>
       <tbody>
         {sortedMembers.map((m, i) => <AttendanceRow
-          key={memberKeys[i]}
+          key={m.key}
           member={m}
-          memberKey={memberKeys[i]}
-          state={state[memberKeys[i]]}
+          memberKey={m.key}
+          state={state[m.key]}
           mode={mode}
           dispatch={dispatch} />)}
       </tbody>
@@ -69,7 +86,7 @@ function AttendanceTable({ attendance, members, dispatch }) {
 }
 
 function AttendanceRow({ member, memberKey, state, mode, dispatch }) {
-  return <tr style={mode === 'not_returned' && state.returned ? { opacity: 0.4 } : {}}>
+  return <tr style={mode === 'not_returned' && (!state.attending || state.returned) ? { opacity: 0.4 } : {}}>
     <td>{member.name}</td>
     <td>
       <input type="checkbox" checked={state.attending} onChange={e => dispatch(e.target.checked ? 'ADD_ATTENDANCE' : 'REMOVE_ATTENDANCE', memberKey)} />

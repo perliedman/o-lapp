@@ -17,6 +17,7 @@ import Events from './Events';
 import firebase from 'firebase'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import Breadcrumbs from './breadcrumbs';
+import Report from './Report';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <section className="section">
           <div className="container">
             <Switch>
+              <Route path="/event/:eventId/report" component={ReportView} />
               <Route path="/event/:eventId" component={EventView} />
               <Route path="/group/:groupId/event/new" component={NewEvent} />
               <Route path="/group/:groupId" component={GroupView} />
@@ -88,6 +90,10 @@ function EventsView({ match: { params: { groupId } } }) {
 
 function EventView({ match: { params: { eventId } } }) {
   return <Event eventId={eventId} />
+}
+
+function ReportView({ match: { params: { eventId } } }) {
+  return <Report eventId={eventId} />
 }
 
 function SignIn () {

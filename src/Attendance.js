@@ -3,6 +3,8 @@ import Query from './Query'
 import { store } from './store'
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from 'react-router-dom';
+import { reduceAttendanceEvents } from './attendance-state';
 
 export default function Attendance({groupId, eventId}) {
   const { state: { database } } = useContext(store)
@@ -10,12 +12,12 @@ export default function Attendance({groupId, eventId}) {
   const [selectedMember, setSelectedMember] = useState()
  
   return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>      
-    {(members, memberKeys) =>  <Query path={`attendance/${eventId}`} acceptEmpty={true}>
+    {(members) =>  <Query path={`attendance/${eventId}`} acceptEmpty={true}>
         {attendance => <>
           <AttendanceTable
             attendance={attendance || {}}
             members={members || {}}
-            memberKeys={memberKeys || []}
+            reportUrl={`/event/${eventId}/report`}
             dispatch={dispatch}
             onMemberSelected={member => setSelectedMember(member)} />
           {selectedMember && <MemberInfoModal member={selectedMember} onClose={() => setSelectedMember(null)} />}
@@ -33,7 +35,7 @@ export default function Attendance({groupId, eventId}) {
   }
 }
 
-function AttendanceTable({ attendance, members, dispatch, onMemberSelected }) {
+function AttendanceTable({ attendance, members, reportUrl, dispatch, onMemberSelected }) {
   const memberKeys = Object.keys(members)
   const [mode, setMode] = useState('attendance')
   const state = reduceAttendanceEvents(memberKeys, attendance)
@@ -67,6 +69,9 @@ function AttendanceTable({ attendance, members, dispatch, onMemberSelected }) {
     [na + (m.attending ? 1 : 0), nnr + (m.attending && !m.returned ? 1 : 0)], [0, 0])
 
   return <>
+    <div className="is-pulled-right">
+      {nNotReturned === 0 && <Link to={reportUrl} className="button is-primary">Avrapportera</Link>}
+    </div>
     <div className="tabs is-toggle">
       <ul>
         {[['Närvaro', 'attendance'], ['Kvar i skogen', 'not_returned']].map(([label, m]) =>
@@ -78,7 +83,9 @@ function AttendanceTable({ attendance, members, dispatch, onMemberSelected }) {
           </li>)}
       </ul>
     </div>
-    <p>{nAttending} närvarande, {nNotReturned} kvar i skogen</p>
+    <p>
+      {nAttending} närvarande, {nNotReturned} kvar i skogen
+    </p>
     <table className="table is-striped is-fullwidth">
       <thead>
         <tr>
@@ -125,42 +132,4 @@ function MemberInfoModal ({ member, onClose }) {
       </div>
     </div>
   </div>
-}
-
-function reduceAttendanceEvents(memberKeys, attendance) {
-  const state = {}
-  for (let key of memberKeys) state[key] = { attending: false, returned: true }
-
-  if (!attendance) return state
-  
-  const events = Object.values(attendance).sort((a, b) => a.dateTime - b.dateTime)
-
-  for (let event of events) {
-    switch (event.type) {
-      case 'ADD_ATTENDANCE':
-        updateState(event.memberKey, { attending: true, returned: false })
-        break
-      case 'REMOVE_ATTENDANCE':
-        updateState(event.memberKey, { attending: false })
-        break
-      case 'NOTE_RETURNED':
-        updateState(event.memberKey, { returned: true })
-        break
-      case 'UNDO_RETURNED':
-        updateState(event.memberKey, { returned: false })
-        break
-      default:
-        console.warn(`Unknown event type ${event.type}`)
-    }
-  }
-
-  return state
-
-  function updateState(memberKey, memberState) {
-    if (!state[memberKey]) {
-      state[memberKey] = memberState
-    } else {
-      state[memberKey] = { ...state[memberKey], ...memberState }
-    }
-  }
 }

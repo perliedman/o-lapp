@@ -12,6 +12,11 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
 
   useEffect(() => {
     const ref = database.ref(path)
+    const onError = error => {
+      console.error('Query error:', error)
+      setState('error')
+    }
+
     setState('loading')
 
     if (!join) {
@@ -19,11 +24,11 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
         setValue(snapshot.val())
         setKey(snapshot.key)
         setState('idle')
-      })
+      }, onError)
 
     } else {
       setValue({})
-      ref.once('value', () => setState('idle'))
+      ref.once('value', () => setState('idle'), onError)
       ref.on('child_added', snapshot => {
         const joinRef = database.ref(join(snapshot.key))
         joinRef.once('value', joinSnapshot => {
@@ -31,8 +36,8 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
           setValue(valueRef.current)
           setKey((keyRef.current || []).concat(joinSnapshot.key))
           setState('idle')
-        })
-      })
+        }, onError)
+      }, onError)
     }
 
     return () => ref.off()
@@ -40,6 +45,8 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
 
   return state === 'loading'
     ? <progress className="progress is-small is-primary" />
+    : state === 'error'
+    ? 'Ett fel inträffade :('
     : !value
     ? (!acceptEmpty
       ? empty || 'Här är det tomt än så länge!'

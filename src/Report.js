@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import Query from './Query'
 import Breadcrumbs from './breadcrumbs'
 import { reduceAttendanceEvents } from './attendance-state';

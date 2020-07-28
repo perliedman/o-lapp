@@ -50,10 +50,8 @@ function StartView () {
       {groups => {
         const groupIds = Object.keys(groups)
 
-        return groupIds.length > 1
+        return groupIds.length > 0
           ? <GroupsView groups={groups} />
-          : groupIds.length === 1
-          ? <Redirect to={`/group/${groupIds[0]}`} />
           : 'Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa dig med det!'}}
       </Query>
     : <section className="section">
@@ -68,8 +66,17 @@ function StartView () {
     </section>
 }
 
-function GroupsView () {
-  return null
+function GroupsView ({ groups }) {
+  return <>
+    <h1>Grupper</h1>
+    {Object.keys(groups).map(groupId => <div key={groupId} className="box">
+      <Link to={`/group/${groupId}`}>
+        <article>
+          <h2 className="title">{groups[groupId].name}</h2>            
+        </article>
+      </Link>
+    </div>)}
+  </>
 }
 
 function GroupView({ match: { params: { groupId } } }) {
@@ -79,12 +86,6 @@ function GroupView({ match: { params: { groupId } } }) {
       <Events group={group} groupId={groupId} />
       <Link to={`/group/${groupId}/event/new`} className="button is-primary">+ Nytt tillfälle</Link>
     </>}
-  </Query>
-}
-
-function EventsView({ match: { params: { groupId } } }) {
-  return <Query path={`/groups/${groupId}`}>
-    {group => <Events group={group} groupId={groupId} />}
   </Query>
 }
 

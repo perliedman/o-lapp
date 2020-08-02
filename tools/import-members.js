@@ -23,6 +23,7 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
     const groupsRef = database.ref('/groups')
     groupsRef.once('value', snapshot => {
       const groupNameMap = {}
+      const groupMembers = {}
       const groups = snapshot.val() || {}
       for (let id in groups) {
         const group = groups[id]
@@ -31,7 +32,8 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
 
       lines.forEach(line => {
         const cols = line.split(',')
-        if (!cols[1].trim()) {
+        const isGuardian = cols[1].trim()
+        if (!isGuardian) {
           const id = cols[4]
           const groupName = cols[0]
 
@@ -40,7 +42,11 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
             groupRef = groupNameMap[groupName]= groupsRef.push()
             groupRef.set({ name: groupName }, awaitCb())
           }
-          groupRef.child(`members/${id}`).set(true, awaitCb())
+          if (!groupMembers[groupRef.key]) {
+            groupMembers[groupRef.key] = { members: {} }
+          }
+
+          groupMembers[groupRef.key].members[id] = true
 
           const memberGroups = (members[id] && members[id].groups) || {}
           memberGroups[groupRef.key] = true
@@ -65,6 +71,8 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
           console.log(members[id].name)
         }
       })
+
+      groupsRef.set(groupMembers, awaitCb())
     })
   })
 

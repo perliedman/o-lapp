@@ -1,5 +1,6 @@
 const admin = require('firebase-admin')
 const { readFile } = require('fs')
+const stats = { nMembers: 0, nGroups: 0 }
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
@@ -40,10 +41,13 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
           let groupRef = groupNameMap[groupName]
           if (!groupRef) {
             groupRef = groupNameMap[groupName]= groupsRef.push()
-            groupRef.set({ name: groupName }, awaitCb())
           }
           if (!groupMembers[groupRef.key]) {
-            groupMembers[groupRef.key] = { members: {} }
+            stats.nGroups++
+            groupMembers[groupRef.key] = 
+              groups[groupRef.key]
+              ? { ...groups[groupRef.key], members: {} }
+              : { name: groupName, members: {} }
           }
 
           groupMembers[groupRef.key].members[id] = true
@@ -68,7 +72,7 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
 
           
           membersRef.child(id).set(members[id], awaitCb())          
-          console.log(members[id].name)
+          stats.nMembers++
         }
       })
 
@@ -87,6 +91,7 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
       }
 
       if (--waitCount <= 0) {
+        console.log(`Successfully imported ${stats.nMembers} members in ${stats.nGroups} groups.`)
         process.exit(0)
       }
     }

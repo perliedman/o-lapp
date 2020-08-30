@@ -1,5 +1,7 @@
 export function reduceAttendanceEvents(memberKeys, attendance) {
-  const state = {}
+  const state = {
+    open: true
+  }
   for (let key of memberKeys) state[key] = { attending: false, returned: true, lastChange: 0 }
 
   if (!attendance) return state
@@ -20,6 +22,12 @@ export function reduceAttendanceEvents(memberKeys, attendance) {
       case 'UNDO_RETURNED':
         updateState(event.memberKey, { returned: false, lastChange: event.createdAt  })
         break
+      case 'CLOSE_EVENT':
+        state.open = false
+        break
+      case 'REOPEN_EVENT':
+        state.open = true
+        break
       default:
         console.warn(`Unknown event type ${event.type}`)
     }
@@ -34,4 +42,15 @@ export function reduceAttendanceEvents(memberKeys, attendance) {
       state[memberKey] = { ...state[memberKey], ...memberState }
     }
   }
+}
+
+export function dispatchEvent(database, user, eventId, payload) {
+  const attendanceRef = database.ref(`attendance/${eventId}`)
+  const eventRef = attendanceRef.push()
+  eventRef.set({
+    ...payload,
+    createdAt: +new Date(),
+    createdBy: user.uid,
+    createdByName: user.displayName
+  })
 }

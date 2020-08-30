@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState, useContext } from 'react'
 import Query from './Query'
 import Breadcrumbs from './breadcrumbs'
-import { reduceAttendanceEvents } from './attendance-state';
+import { reduceAttendanceEvents, dispatchEvent } from './attendance-state';
+import { store } from './store'
 
 export default function Report({eventId}) {
   return <Query path={`events/${eventId}`}>
@@ -15,6 +16,7 @@ export default function Report({eventId}) {
         <Query path={`groups/${event.groupId}/members`} join={memberKey => `members/${memberKey}`}>      
           {(members) => <Query path={`attendance/${eventId}`} acceptEmpty={true}>
             {attendance => <ReportBody
+              eventId={eventId}
               event={event}
               group={group}
               attendance={attendance || {}}
@@ -26,11 +28,12 @@ export default function Report({eventId}) {
   </Query> 
 }
 
-function ReportBody ({ group, event, members, attendance }) {
+function ReportBody ({ group, eventId, event, members, attendance }) {
+  const { state: { database, user } } = useContext(store)
   const [mailBody, setMailBody] = useState()
   const containerRef = useCallback(node => {
     if (node) {
-      setMailBody(node.innerText)
+      setMailBody(node.innerText.replace(/\n/g, '\r\n'))
     }
   }, [])
   const memberKeys = Object.keys(members)
@@ -44,11 +47,16 @@ function ReportBody ({ group, event, members, attendance }) {
     na + (m.attending ? 1 : 0), 0)
 
   return <>
-    {mailBody && <a 
-      href={`mailto:per@liedman.net?subject=${encodeURIComponent('Närvarorapport ' + event.name)}&body=${encodeURIComponent(mailBody)}`}
-      className="button is-primary">
-      Maila rapport
-    </a>}
+    {!state.open
+      ? <button type="button" className="button is-primary">Återöppna</button>
+      : mailBody
+      ? <a 
+        onClick={() => dispatchEvent(database, user, eventId, { type: 'CLOSE_EVENT', createdAt: +new Date(), createdBy: user.uid, createdByName: user.displayName })}
+        href={`mailto:robert.jerkstrand@toleredutby.se?subject=${encodeURIComponent('Närvarorapport ' + event.name)}&body=${encodeURIComponent(mailBody)}`}
+        className="button is-primary">
+        Maila rapport
+      </a>
+      : null}
     <div ref={containerRef}>
       <h1 className="is-size-4">{event.name}</h1>
       <p>{group.name} {event.date}, {nAttending} närvarande</p>

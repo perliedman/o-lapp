@@ -4,13 +4,12 @@ import { store } from './store'
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from 'react-router-dom';
-import { reduceAttendanceEvents } from './attendance-state';
+import { reduceAttendanceEvents, dispatchEvent } from './attendance-state';
 import formatRelative from 'date-fns/formatRelative';
 import { sv } from 'date-fns/locale'
 
 export default function Attendance({groupId, eventId}) {
   const { state: { database, user } } = useContext(store)
-  const attendanceRef = useMemo(() => database.ref(`attendance/${eventId}`), [eventId, database])
   const [selectedMember, setSelectedMember] = useState()
  
   return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>      
@@ -36,22 +35,18 @@ export default function Attendance({groupId, eventId}) {
     return function(eventType, memberKey) {
       const now = +new Date()
 
-      // If another user created an event for the same user
-      // within the timeout period, it's likely a conflict,
-      // don't create this event.
-      const lastMemberEventWithinTimeout = 
-        sortEvents(events).reverse()
-        .find(e => e.memberKey === memberKey && e.createdBy !== user.uid && now - e.createdAt < 5000)
-      if (lastMemberEventWithinTimeout) return
-
-      const eventRef = attendanceRef.push()
-      eventRef.set({
-        type: eventType,
-        memberKey,
-        createdAt: now,
-        createdBy: user.uid,
-        createdByName: user.displayName
-      })
+      if (memberKey) {
+        // If another user created an event for the same user
+        // within the timeout period, it's likely a conflict,
+        // don't create this event.
+        const lastMemberEventWithinTimeout = 
+          sortEvents(events).reverse()
+          .find(e => e.memberKey === memberKey && e.createdBy !== user.uid && now - e.createdAt < 5000)
+        if (lastMemberEventWithinTimeout) return
+        dispatchEvent(database, user, eventId, { type: eventType, memberKey })
+      } else {
+        dispatchEvent(database, user, eventId, { type: eventType })
+      }
     }
   }
 }
@@ -91,7 +86,10 @@ function AttendanceTable({ attendance, members, reportUrl, dispatch, onMemberSel
 
   return <>
     <div className="is-pulled-right">
-      {nNotReturned === 0 && <Link to={reportUrl} className="button is-primary">Avrapportera</Link>}
+      {!state.open ? <button onClick={() => dispatch('REOPEN_EVENT')} className="button is-primary">Återöppna</button>
+        : nNotReturned === 0
+        ? <Link to={reportUrl} className="button is-primary">Avrapportera</Link>
+        : null}
     </div>
     <div className="tabs is-toggle">
       <ul>
@@ -122,6 +120,7 @@ function AttendanceTable({ attendance, members, reportUrl, dispatch, onMemberSel
           memberKey={m.key}
           state={state[m.key]}
           mode={mode}
+          disabled={!state.open}
           dispatch={dispatch}
           onNameClicked={() => onMemberSelected && onMemberSelected(m)} />)}
       </tbody>
@@ -129,14 +128,14 @@ function AttendanceTable({ attendance, members, reportUrl, dispatch, onMemberSel
   </>
 }
 
-function AttendanceRow({ member, memberKey, state, mode, dispatch, onNameClicked }) {
+function AttendanceRow({ member, memberKey, state, mode, disabled, dispatch, onNameClicked }) {
   return <tr style={mode === 'not_returned' && (!state.attending || state.returned) ? { opacity: 0.4 } : {}}>
     <td onClick={onNameClicked}>{member.name}</td>
     <td>
-      <input type="checkbox" checked={state.attending} onChange={e => dispatch(e.target.checked ? 'ADD_ATTENDANCE' : 'REMOVE_ATTENDANCE', memberKey)} />
+      <input type="checkbox" checked={state.attending} disabled={disabled} onChange={e => dispatch(e.target.checked ? 'ADD_ATTENDANCE' : 'REMOVE_ATTENDANCE', memberKey)} />
     </td>
     <td>
-      <input type="checkbox" checked={state.attending && state.returned} disabled={!state.attending} onChange={e => dispatch(e.target.checked ? 'NOTE_RETURNED' : 'UNDO_RETURNED', memberKey)} />
+      <input type="checkbox" checked={state.attending && state.returned} disabled={disabled || !state.attending} onChange={e => dispatch(e.target.checked ? 'NOTE_RETURNED' : 'UNDO_RETURNED', memberKey)} />
     </td>
   </tr>
 }
@@ -161,9 +160,9 @@ function Log({ attendance, members }) {
 
   return <ul>
     {events.slice(events.length - 10).reverse().map(e => {
-      const description = eventDescription(e.type)
+      const description = eventDescription(e)
       return description && <li key={e.createdAt}>
-        {members[e.memberKey].name} {description}
+        {description}
         <span className="has-text-grey-light">
           &nbsp;({formatRelative(e.createdAt, now, { locale: sv })}
           {e.createdByName && ` av ${e.createdByName}`})
@@ -172,16 +171,21 @@ function Log({ attendance, members }) {
     })}
   </ul>
 
-  function eventDescription(type) {
+  function eventDescription(event) {
+    const { type, memberKey } = event
     switch (type) {
       case 'ADD_ATTENDANCE':
-        return 'är närvarande'
+        return `${members[memberKey].name} är närvarande`
       case 'REMOVE_ATTENDANCE':
-        return 'är ej närvarande'
+        return `${members[memberKey].name} är ej närvarande`
       case 'NOTE_RETURNED':
-        return 'är tillbaka'
+        return `${members[memberKey].name} är tillbaka`
       case 'UNDO_RETURNED':
-        return 'är ute i skogen'
+        return `${members[memberKey].name} är ute i skogen`
+      case 'CLOSE_EVENT':
+        return `Tillfället är avslutat`
+      case 'REOPEN_EVENT':
+        return `Tillfället öppnades igen`
       default:
         return null
     }

@@ -7,12 +7,11 @@ export default function Navbar () {
   const { state: { user, auth } } = useContext(store)
   const [menuOpen, setMenuOpen] = useState(false) 
 
-  return <nav className="navbar is-info is-spaced" role="navigation" aria-label="main navigation">
+  return <nav className="navbar is-fixed-top is-info is-spaced" role="navigation" aria-label="main navigation">
     <div className="navbar-brand">
       <Link className="navbar-item" to="/">
         <div>
           <span className="is-size-4 has-text-weight-bold">o-Lapp</span><br/>
-          Digital närvarolista för orienterare
         </div>
       </Link>
 

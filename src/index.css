@@ -11,3 +11,39 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.app {
+  position: relative;
+  display: flex;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  overflow-y: scroll;
+}
+
+.has-log-fixed-bottom {
+  padding-bottom: 5em;
+}
+
+.log {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 7.5em;
+  background-color: white;
+  border-top: 1px solid #b5b5b5;
+  overflow-y: auto;
+}
+
+.log .section {
+  padding-top: 0.5em;
+}

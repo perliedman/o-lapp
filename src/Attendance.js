@@ -5,33 +5,54 @@ import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from 'react-router-dom';
 import { reduceAttendanceEvents } from './attendance-state';
+import formatRelative from 'date-fns/formatRelative';
+import { sv } from 'date-fns/locale'
 
 export default function Attendance({groupId, eventId}) {
-  const { state: { database } } = useContext(store)
+  const { state: { database, user } } = useContext(store)
   const attendanceRef = useMemo(() => database.ref(`attendance/${eventId}`), [eventId, database])
   const [selectedMember, setSelectedMember] = useState()
  
   return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>      
     {(members) =>  <Query path={`attendance/${eventId}`} acceptEmpty={true}>
-        {attendance => <>
+        {attendance => <div>
           <AttendanceTable
             attendance={attendance || {}}
             members={members || {}}
             reportUrl={`/event/${eventId}/report`}
-            dispatch={dispatch}
+            dispatch={createDispatch(attendance)}
             onMemberSelected={member => setSelectedMember(member)} />
           {selectedMember && <MemberInfoModal member={selectedMember} onClose={() => setSelectedMember(null)} />}
-        </>}
+          <div className="log">
+            <section className="section">
+              <Log attendance={attendance || {}} members={members || {}} />
+            </section>
+          </div>
+        </div>}
     </Query>}
   </Query>
 
-  function dispatch (eventType, memberKey) {
-    const eventRef = attendanceRef.push()
-    eventRef.set({
-      type: eventType,
-      memberKey,
-      createdAt: +new Date()
-    })
+  function createDispatch (events) {
+    return function(eventType, memberKey) {
+      const now = +new Date()
+
+      // If another user created an event for the same user
+      // within the timeout period, it's likely a conflict,
+      // don't create this event.
+      const lastMemberEventWithinTimeout = 
+        sortEvents(events).reverse()
+        .find(e => e.memberKey === memberKey && e.createdBy !== user.uid && now - e.createdAt < 5000)
+      if (lastMemberEventWithinTimeout) return
+
+      const eventRef = attendanceRef.push()
+      eventRef.set({
+        type: eventType,
+        memberKey,
+        createdAt: now,
+        createdBy: user.uid,
+        createdByName: user.displayName
+      })
+    }
   }
 }
 
@@ -132,4 +153,41 @@ function MemberInfoModal ({ member, onClose }) {
       </div>
     </div>
   </div>
+}
+
+function Log({ attendance, members }) {
+  const events = useMemo(() => sortEvents(attendance), [attendance])
+  const now = new Date()
+
+  return <ul>
+    {events.slice(events.length - 10).reverse().map(e => {
+      const description = eventDescription(e.type)
+      return description && <li key={e.createdAt}>
+        {members[e.memberKey].name} {description}
+        <span className="has-text-grey-light">
+          &nbsp;({formatRelative(e.createdAt, now, { locale: sv })}
+          {e.createdByName && ` av ${e.createdByName}`})
+        </span>
+      </li>
+    })}
+  </ul>
+
+  function eventDescription(type) {
+    switch (type) {
+      case 'ADD_ATTENDANCE':
+        return 'är närvarande'
+      case 'REMOVE_ATTENDANCE':
+        return 'är ej närvarande'
+      case 'NOTE_RETURNED':
+        return 'är tillbaka'
+      case 'UNDO_RETURNED':
+        return 'är ute i skogen'
+      default:
+        return null
+    }
+  }
+}
+
+function sortEvents (events) {
+  return Object.values(events || {}).sort((a, b) => a.createdAt - b.createdAt)
 }

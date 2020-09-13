@@ -55,24 +55,30 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
           const memberGroups = (members[id] && members[id].groups) || {}
           memberGroups[groupRef.key] = true
 
-          const phone = cols[6].startsWith('46')
-            ? '+' + cols[6] 
-            : cols[6].startsWith('0')
-            ? cols[6]
-            : '0' + cols[6] 
-
           members[id] = {
             ...members[id],
-            name: [cols[2], cols[3]].join(' '),
-            phone,
-            email: cols[7],
-            birthdate: cols[5],
+            ...colsToMember(cols),
+            guardians: {},
             groups: memberGroups
           }
-
           
           membersRef.child(id).set(members[id], awaitCb())          
           stats.nMembers++
+        } else {
+          const pattern = /Till målsman för:\s*(.*)/
+          const childName = pattern.exec(cols[1])[1].trim()
+          const childId = Object.keys(members).find(id => members[id].name === childName)
+          if (!childId) {
+            console.error(`Unable to find child with name ${childName} for guardian ${cols[2]} ${cols[3]}`)
+          } else {
+            const child = members[childId]
+            let gs = child.guardians
+            if (!gs) {
+              gs = child.guardians = {}
+            }
+            gs[cols[4]] = colsToMember(cols)
+            membersRef.child(childId).set(child, awaitCb())          
+          }
         }
       })
 
@@ -94,6 +100,21 @@ readFile(process.argv[2], 'utf-8', (err, data) => {
         console.log(`Successfully imported ${stats.nMembers} members in ${stats.nGroups} groups.`)
         process.exit(0)
       }
+    }
+  }
+
+  function colsToMember (cols) {
+    const phone = cols[6].startsWith('46')
+      ? '+' + cols[6] 
+      : cols[6].startsWith('0')
+      ? cols[6]
+      : '0' + cols[6] 
+
+    return {
+      name: [cols[2], cols[3]].join(' '),
+      phone,
+      email: cols[7],
+      birthdate: cols[5],
     }
   }
 })

@@ -12,8 +12,8 @@ export default function Attendance({groupId, eventId}) {
   const { state: { database, user } } = useContext(store)
   const [selectedMember, setSelectedMember] = useState()
  
-  return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>      
-    {(members) =>  <Query path={`attendance/${eventId}`} acceptEmpty={true}>
+  return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>
+    {(members) => <Query path={`attendance/${eventId}`} acceptEmpty={true}>
         {attendance => <div>
           <AttendanceTable
             attendance={attendance || {}}
@@ -175,19 +175,23 @@ function Log({ attendance, members }) {
     const { type, memberKey } = event
     switch (type) {
       case 'ADD_ATTENDANCE':
-        return `${members[memberKey].name} är närvarande`
+        return `${memberName(event)} är närvarande`
       case 'REMOVE_ATTENDANCE':
-        return `${members[memberKey].name} är ej närvarande`
+        return `${memberName(event)} är ej närvarande`
       case 'NOTE_RETURNED':
-        return `${members[memberKey].name} är tillbaka`
+        return `${memberName(event)} är tillbaka`
       case 'UNDO_RETURNED':
-        return `${members[memberKey].name} är ute i skogen`
+        return `${memberName(event)} är ute i skogen`
       case 'CLOSE_EVENT':
         return `Tillfället är avslutat`
       case 'REOPEN_EVENT':
         return `Tillfället öppnades igen`
       default:
         return null
+    }
+
+    function memberName (e) {
+      return members[memberKey] && members[memberKey].name
     }
   }
 }

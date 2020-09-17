@@ -141,13 +141,17 @@ function AttendanceRow({ member, memberKey, state, mode, disabled, dispatch, onN
 }
 
 function MemberInfoModal ({ member, onClose }) {
+  const guardians = Object.values(member.guardians || {})
+
   return <div className="modal is-active">
     <div className="modal-background"></div>
     <div className="modal-content">
       <div className="box">
-        <h2>{member.name}</h2>
-        <p><FontAwesomeIcon icon={faPhone} />&nbsp;<a href={`tel:${member.phone}`}>{member.phone}</a></p>
-        <p><FontAwesomeIcon icon={faEnvelope} />&nbsp;<a href={`mailto:${member.email}`}>{member.email}</a></p>
+        {[member, ...guardians].map(p => <>
+          <h2>{p.name}</h2>
+          <p><FontAwesomeIcon icon={faPhone} />&nbsp;<a href={`tel:${p.phone}`}>{p.phone || '-'}</a></p>
+          <p><FontAwesomeIcon icon={faEnvelope} />&nbsp;<a href={`mailto:${p.email}`}>{p.email || '-'}</a></p>
+        </>)}
         <button className="modal-close is-large" aria-label="close" onClick={onClose}></button>
       </div>
     </div>

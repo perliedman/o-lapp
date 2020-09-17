@@ -40,7 +40,9 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
       }, onError)
     }
 
-    return () => ref.off()
+    return () => {
+      ref.off()
+    }
   }, [database, path, join])
 
   return state === 'loading'

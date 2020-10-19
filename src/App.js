@@ -68,7 +68,7 @@ function StartView () {
 
 function GroupsView ({ groups }) {
   return <>
-    <h1>Grupper</h1>
+    <Breadcrumbs crumbs={[]}>o-Lapp</Breadcrumbs>
     {Object.keys(groups).map(groupId => <div key={groupId} className="box">
       <Link to={`/group/${groupId}`}>
         <article>

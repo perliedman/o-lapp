@@ -59,12 +59,19 @@ function ReportBody ({ group, eventId, event, members, attendance }) {
       : null}
     <div ref={containerRef}>
       <h1 className="is-size-4">{event.name}</h1>
-      <p>{group.name} {event.date}, {nAttending} närvarande</p>
+      <p>{group.name} {event.date}, {nAttending} närvarande.</p>
       <ul>
         {sortedMembers.map(m => <li key={m.key}>
           {m.name}
         </li>)}
       </ul>
+
+      <p>
+        Med vänlig hälsning,<br/>
+        {user.displayName}
+      </p>
+
+      <p>Rapporten skapades automatiskt med <a href="https://narvaro.toleredsaik.se/">o-lapp</a>.</p>
     </div>
   </>
 }

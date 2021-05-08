@@ -11,7 +11,8 @@ firebase.analytics()
 
 const initialState = {
   database: firebase.database(),
-  auth: firebase.auth()
+  auth: firebase.auth(),
+  sort: 'attendance'
 }
 
 const store = createContext(initialState)
@@ -48,6 +49,11 @@ function reducer(state, action) {
       return {
         ...state,
         user: undefined
+      }
+    case 'SET_SORT':
+      return {
+        ...state,
+        sort: action.sort
       }
     default:
       throw new Error(`Unknown action ${action.type}`)

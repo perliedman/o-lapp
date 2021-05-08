@@ -9,7 +9,7 @@ import formatRelative from 'date-fns/formatRelative';
 import { sv } from 'date-fns/locale'
 
 export default function Attendance({groupId, eventId}) {
-  const { state: { database, user } } = useContext(store)
+  const { state: { database, user, sort }, dispatch } = useContext(store)
   const [selectedMember, setSelectedMember] = useState()
  
   return <Query path={`groups/${groupId}/members`} join={memberKey => `members/${memberKey}`}>
@@ -20,7 +20,9 @@ export default function Attendance({groupId, eventId}) {
             members={members || {}}
             reportUrl={`/event/${eventId}/report`}
             dispatch={createDispatch(attendance)}
-            onMemberSelected={member => setSelectedMember(member)} />
+            onMemberSelected={member => setSelectedMember(member)}
+            sort={sort}
+            setSort={sort => dispatch({type: 'SET_SORT', sort})} />
           {selectedMember && <MemberInfoModal member={selectedMember} onClose={() => setSelectedMember(null)} />}
           <div className="log">
             <section className="section">
@@ -51,9 +53,8 @@ export default function Attendance({groupId, eventId}) {
   }
 }
 
-function AttendanceTable({ attendance, members, reportUrl, dispatch, onMemberSelected }) {
+function AttendanceTable({ attendance, members, reportUrl, dispatch, onMemberSelected, sort: mode, setSort: setMode }) {
   const memberKeys = Object.keys(members)
-  const [mode, setMode] = useState('attendance')
   const state = reduceAttendanceEvents(memberKeys, attendance)
   const sortedMembers = useMemo(() => {
     const byName = (a, b) =>

@@ -33,7 +33,14 @@ function ReportBody ({ group, eventId, event, members, attendance }) {
   const [mailBody, setMailBody] = useState()
   const containerRef = useCallback(node => {
     if (node) {
-      setMailBody(node.innerText.replace(/\n/g, '\r\n'))
+      // I can't see any good reason innerText should *ever*
+      // contain HTML tags, but after iOS upgrade around june 2021,
+      // some clients started generating mails with "<BR>" as line
+      // breaks. Try to work around this.
+      const body = node.innerText
+        .replace(/<br>/gi, '\n')
+        .replace(/\n/g, '\r\n')
+      setMailBody(body)
     }
   }, [])
   const memberKeys = Object.keys(members)

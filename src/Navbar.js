@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
 import { store } from "./store";
@@ -9,7 +9,6 @@ export default function Navbar() {
   const {
     state: { user, auth },
   } = useContext(store);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="m-1">
@@ -18,21 +17,9 @@ export default function Navbar() {
           <Link to="/">
             <div>o-Lapp</div>
           </Link>
-
-          <a
-            role="button"
-            className={`navbar-burger burger ${menuOpen ? "is-active" : ""}`}
-            aria-label="menu"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-          </a>
         </div>
 
-        <div className={`navbar-menu ${menuOpen ? "is-active" : ""}`}>
+        <div className={`navbar-menu`}>
           <div>
             {user && (
               <div className="flex flex-row">

@@ -1,0 +1,19 @@
+.box {
+  @apply border border-sky-900 rounded p-4 mb-2 text-sky-900;
+}
+
+.button {
+  @apply border border-sky-600 rounded-md p-2;
+}
+
+.is-pulled-right {
+  @apply float-right;
+}
+
+.title {
+  @apply text-xl font-bold;
+}
+
+.meta {
+  @apply text-gray-400;
+}

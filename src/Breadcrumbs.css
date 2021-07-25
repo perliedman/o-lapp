@@ -1,0 +1,23 @@
+.breadcrumb {
+  @apply text-sm text-sky-200 mb-6;
+}
+
+.breadcrumb ul {
+  @apply list-none;
+}
+
+.breadcrumb li {
+  @apply inline;
+}
+
+.breadcrumb li.is-active {
+  @apply text-gray-400;
+}
+
+.breadcrumb li::after {
+  content: " > ";
+}
+
+.breadcrumb li:last-child::after {
+  content: "";
+}

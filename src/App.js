@@ -18,6 +18,7 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import Breadcrumbs from "./breadcrumbs";
 import Report from "./Report";
 import "./App.css";
+import Button from "./ui/Button";
 
 function App() {
   return (
@@ -58,7 +59,10 @@ function StartView() {
         return groupIds.length > 0 ? (
           <GroupsView groups={groups} />
         ) : (
-          "Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa dig med det!"
+          <section className="content">
+            Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa
+            dig med det!
+          </section>
         );
       }}
     </Query>
@@ -176,12 +180,14 @@ function NewEvent({
     <Query path={`/groups/${groupId}`}>
       {(group) => (
         <>
-          <Breadcrumbs
-            crumbs={[
-              [`/group/${groupId}`, group.name],
-              [`/group/${groupId}/event/new`, "Nytt tillfälle"],
-            ]}
-          />
+          <div className="heading">
+            <Breadcrumbs
+              crumbs={[
+                [`/group/${groupId}`, group.name],
+                [`/group/${groupId}/event/new`, "Nytt tillfälle"],
+              ]}
+            />
+          </div>
           <form onSubmit={onSubmit}>
             <div className="field">
               <label className="label">Namn</label>
@@ -203,24 +209,16 @@ function NewEvent({
                 onChange={(e) => setEventDate(e.target.value)}
               />
             </div>
-            <div className="field is-grouped">
-              <div className="control">
-                <button
-                  type="submit"
-                  className="button is-link"
-                  disabled={!eventName || !eventDate}
-                >
-                  Spara
-                </button>
-              </div>
-              <div className="control">
-                <Link
-                  to={`/group/${groupId}`}
-                  className="button is-link is-light"
-                >
-                  Avbryt
-                </Link>
-              </div>
+            <div className="actions mr-4">
+              <Button
+                className="bg-sky-900 text-white mr-2"
+                disabled={!eventName || !eventDate}
+              >
+                Spara
+              </Button>
+              <Link to={`/group/${groupId}`} className="button">
+                Avbryt
+              </Link>
             </div>
           </form>
         </>

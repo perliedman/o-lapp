@@ -10,15 +10,20 @@
   @apply border border-gray-200 p-4 text-sky-900 rounded-md bg-white;
 }
 
-.box-group {
-}
-
 .box-group .box {
   @apply rounded-none border-t-0 first:rounded-t-md first:border-t last:rounded-b-md shadow;
 }
 
 .button {
   @apply border border-sky-600 rounded-md p-2;
+}
+
+.button.active {
+  @apply bg-sky-900 text-white;
+}
+
+.button-group .button {
+  @apply inline-block rounded-none border-l-0 first:rounded-l-md first:border-l last:rounded-r-md;
 }
 
 .is-pulled-right {
@@ -35,4 +40,24 @@
 
 p {
   @apply mb-4;
+}
+
+form {
+  @apply bg-white py-4;
+}
+
+.field {
+  @apply m-4;
+}
+
+.field label {
+  @apply block;
+}
+
+.field input {
+  @apply w-full bg-gray-200 h-12 p-2 rounded;
+}
+
+.actions {
+  @apply flex justify-end;
 }

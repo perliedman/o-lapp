@@ -62,18 +62,20 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
     };
   }, [database, path, join]);
 
-  return state === "loading" ? (
-    <div className="m-8">
-      <Spinner className="text-gray-400" />
+  return state !== "idle" || !value ? (
+    <div className="content">
+      {state === "loading" ? (
+        <Spinner className="text-gray-400" />
+      ) : state === "error" ? (
+        "Ett fel inträffade :("
+      ) : !value ? (
+        !acceptEmpty ? (
+          empty || "Här är det tomt än så länge!"
+        ) : null
+      ) : (
+        "Ett konstigt fel inträffade :("
+      )}
     </div>
-  ) : state === "error" ? (
-    "Ett fel inträffade :("
-  ) : !value ? (
-    !acceptEmpty ? (
-      empty || "Här är det tomt än så länge!"
-    ) : (
-      children(value, key)
-    )
   ) : (
     children(value, key)
   );

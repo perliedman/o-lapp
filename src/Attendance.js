@@ -8,6 +8,7 @@ import { reduceAttendanceEvents, dispatchEvent } from "./attendance-state";
 import formatRelative from "date-fns/formatRelative";
 import { sv } from "date-fns/locale";
 import "./Attendance.css";
+import Button from "./ui/Button";
 
 export default function Attendance({ groupId, eventId }) {
   const {
@@ -137,25 +138,21 @@ function AttendanceTable({
           </Link>
         ) : null}
       </div>
-      <div className="tabs is-toggle">
-        <ul>
-          {[
-            ["Närvaro", "attendance"],
-            ["Kvar i skogen", "not_returned"],
-          ].map(([label, m]) => (
-            <li key={m} className={m === mode ? "is-active" : ""}>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setMode(m);
-                }}
-              >
-                {label}
-              </a>
-            </li>
-          ))}
-        </ul>
+      <div className="button-group mb-2">
+        {[
+          ["Närvaro", "attendance"],
+          ["Kvar i skogen", "not_returned"],
+        ].map(([label, m]) => (
+          <Button
+            key={m}
+            onClick={(e) => {
+              setMode(m);
+            }}
+            className={m === mode ? "active" : ""}
+          >
+            {label}
+          </Button>
+        ))}
       </div>
       <p>
         {nAttending} närvarande, {nNotReturned} kvar i skogen
@@ -183,6 +180,7 @@ function AttendanceTable({
           ))}
         </tbody>
       </table>
+      <div className="bottom-filler" />
     </>
   );
 }

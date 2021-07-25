@@ -2,6 +2,10 @@
   @apply w-full bg-white shadow rounded;
 }
 
+.bottom-filler {
+  height: 3.75em;
+}
+
 .attendance-table th,
 td {
   @apply p-2;

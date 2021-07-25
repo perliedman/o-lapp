@@ -18,20 +18,24 @@ export default function Events({ group, groupId }) {
           }))
           .sort((a, b) => cmp(b.date, a.date));
 
-        return sortedEvents.map((event) => (
-          <div key={event.id} className="box">
-            <article>
-              <Link to={`/event/${event.id}`}>
-                <h2 className="title">{event.name}</h2>
-              </Link>
-              <span className="meta">
-                {formatRelative(parseISO(event.date), new Date(), {
-                  locale: sv,
-                })}
-              </span>
-            </article>
+        return (
+          <div className="box-group">
+            {sortedEvents.map((event) => (
+              <div key={event.id} className="box">
+                <article>
+                  <Link to={`/event/${event.id}`}>
+                    <h2 className="title">{event.name}</h2>
+                  </Link>
+                  <span className="meta">
+                    {formatRelative(parseISO(event.date), new Date(), {
+                      locale: sv,
+                    })}
+                  </span>
+                </article>
+              </div>
+            ))}
           </div>
-        ));
+        );
       }}
     </Query>
   );

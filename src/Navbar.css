@@ -1,0 +1,15 @@
+.navbar {
+  @apply w-full rounded bg-sky-900 flex flex-row justify-between items-center p-4 text-white;
+}
+
+.navbar-brand {
+  @apply text-xl;
+}
+
+.navbar-item {
+  @apply text-lg font-thin mr-4 flex items-center;
+}
+
+.navbar-end {
+  @apply flex flex-row items-center;
+}

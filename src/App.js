@@ -10,7 +10,6 @@ import { StateProvider, store } from './store';
 import Navbar from './Navbar'
 import Event from './Event';
 
-import 'bulma/css/bulma.css';
 import Query from './Query';
 import Events from './Events';
 
@@ -25,8 +24,8 @@ function App() {
       <Router>
         <Navbar />
 
-        <section className="section">
-          <div className="container">
+        <section>
+          <div className="container m-1 p-3">
             <Switch>
               <Route path="/event/:eventId/report" component={ReportView} />
               <Route path="/event/:eventId" component={EventView} />

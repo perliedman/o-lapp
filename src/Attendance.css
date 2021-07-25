@@ -1,0 +1,16 @@
+.attendance-table {
+  @apply w-full bg-white shadow rounded;
+}
+
+.attendance-table th,
+td {
+  @apply p-2;
+}
+
+.attendance-table tr {
+  @apply odd:bg-gray-50;
+}
+
+.attendance-table th {
+  @apply text-left;
+}

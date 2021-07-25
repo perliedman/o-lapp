@@ -63,11 +63,9 @@ function StartView() {
       }}
     </Query>
   ) : (
-    <section className="section">
-      <p>
-        Logga in för att hantera närvaro. Första gången du loggar in behöver du
-        registrera din användare.
-      </p>
+    <section className="content">
+      <p>Logga in för att hantera närvaro.</p>
+      <p>Första gången du loggar in behöver du registrera din användare.</p>
       <p>
         <Link className="button is-success" to="/signin">
           <strong>Logga In</strong>

@@ -14,6 +14,7 @@ module.exports = {
     extend: {
       borderRadius: ["first", "last"],
       borderWidth: ["first"],
+      backgroundColor: ["odd"],
     },
   },
   plugins: [],

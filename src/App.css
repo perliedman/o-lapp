@@ -1,5 +1,20 @@
+.heading {
+  @apply w-full bg-white p-4;
+}
+
+.content {
+  @apply p-4;
+}
+
 .box {
-  @apply border border-sky-900 rounded p-4 mb-2 text-sky-900;
+  @apply border border-gray-200 p-4 text-sky-900 rounded-md bg-white;
+}
+
+.box-group {
+}
+
+.box-group .box {
+  @apply rounded-none border-t-0 first:rounded-t-md first:border-t last:rounded-b-md shadow;
 }
 
 .button {

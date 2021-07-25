@@ -26,7 +26,7 @@ function App() {
         <Navbar />
 
         <section>
-          <div className="container m-1 p-3">
+          <div className="container">
             <Switch>
               <Route path="/event/:eventId/report" component={ReportView} />
               <Route path="/event/:eventId" component={EventView} />
@@ -80,16 +80,22 @@ function StartView() {
 function GroupsView({ groups }) {
   return (
     <>
-      <Breadcrumbs crumbs={[]}>o-Lapp</Breadcrumbs>
-      {Object.keys(groups).map((groupId) => (
-        <div key={groupId} className="box">
-          <Link to={`/group/${groupId}`}>
-            <article>
-              <h2 className="title">{groups[groupId].name}</h2>
-            </article>
-          </Link>
+      <div className="heading">
+        <Breadcrumbs crumbs={[]}>o-Lapp</Breadcrumbs>
+      </div>
+      <div className="content">
+        <div className="box-group">
+          {Object.keys(groups).map((groupId) => (
+            <div key={groupId} className="box">
+              <Link to={`/group/${groupId}`}>
+                <article>
+                  <h2 className="title">{groups[groupId].name}</h2>
+                </article>
+              </Link>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </>
   );
 }
@@ -103,18 +109,22 @@ function GroupView({
     <Query path={`/groups/${groupId}`}>
       {(group) => (
         <>
-          <div className="is-pulled-right">
-            <Link
-              to={`/group/${groupId}/event/new`}
-              className="button is-primary"
-            >
-              + Nytt tillfälle
-            </Link>
+          <div className="heading">
+            <div className="is-pulled-right">
+              <Link
+                to={`/group/${groupId}/event/new`}
+                className="button is-primary"
+              >
+                + Nytt tillfälle
+              </Link>
+            </div>
+            <Breadcrumbs crumbs={[[`/group/${groupId}`, group.name]]}>
+              {group.name}
+            </Breadcrumbs>
           </div>
-          <Breadcrumbs crumbs={[[`/group/${groupId}`, group.name]]}>
-            {group.name}
-          </Breadcrumbs>
-          <Events group={group} groupId={groupId} />
+          <section className="content">
+            <Events group={group} groupId={groupId} />
+          </section>
         </>
       )}
     </Query>

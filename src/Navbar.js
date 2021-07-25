@@ -11,7 +11,7 @@ export default function Navbar() {
   } = useContext(store);
 
   return (
-    <div className="m-1">
+    <div>
       <nav className="navbar" role="navigation" aria-label="main navigation">
         <div className="navbar-brand">
           <Link to="/">

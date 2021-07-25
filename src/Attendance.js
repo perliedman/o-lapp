@@ -31,6 +31,7 @@ export default function Attendance({ groupId, eventId }) {
                 members={members || {}}
                 reportUrl={`/event/${eventId}/report`}
                 dispatch={createDispatch(attendance)}
+                reopenEvent={() => setEventClosed(attendance, false)}
                 onMemberSelected={(member) => setSelectedMember(member)}
                 sort={sort}
                 setSort={(sort) => dispatch({ type: "SET_SORT", sort })}
@@ -69,12 +70,22 @@ export default function Attendance({ groupId, eventId }) {
               e.createdBy !== user.uid &&
               now - e.createdAt < 5000
           );
-        if (lastMemberEventWithinTimeout) return;
+        if (lastMemberEventWithinTimeout) return false;
         dispatchEvent(database, user, eventId, { type: eventType, memberKey });
+        return true;
       } else {
         dispatchEvent(database, user, eventId, { type: eventType });
+        return true;
       }
     };
+  }
+
+  function setEventClosed(events, isClosed) {
+    const dispatch = createDispatch(events);
+    if (dispatch(isClosed ? "CLOSE_EVENT" : "REOPEN_EVENT")) {
+      const eventClosedRef = database.ref(`/events/${eventId}/closed`);
+      eventClosedRef.set(isClosed);
+    }
   }
 }
 
@@ -83,6 +94,7 @@ function AttendanceTable({
   members,
   reportUrl,
   dispatch,
+  reopenEvent,
   onMemberSelected,
   sort: mode,
   setSort: setMode,
@@ -126,10 +138,7 @@ function AttendanceTable({
     <>
       <div className="is-pulled-right">
         {!state.open ? (
-          <button
-            onClick={() => dispatch("REOPEN_EVENT")}
-            className="button is-primary"
-          >
+          <button onClick={reopenEvent} className="button is-primary">
             Återöppna
           </button>
         ) : nNotReturned === 0 ? (

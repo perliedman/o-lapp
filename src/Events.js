@@ -24,12 +24,21 @@ export default function Events({ group, groupId }) {
               <div key={event.id} className="box">
                 <article>
                   <Link to={`/event/${event.id}`}>
-                    <h2 className="title">{event.name}</h2>
+                    <h2
+                      className={`title ${event.closed ? "text-sky-200" : ""}`}
+                    >
+                      {event.name}
+                    </h2>
                   </Link>
-                  <span className="meta">
-                    {formatRelative(parseISO(event.date), new Date(), {
-                      locale: sv,
-                    })}
+                  <span className="meta flex">
+                    <span className="mr-4">
+                      {formatRelative(parseISO(event.date), new Date(), {
+                        locale: sv,
+                      })}
+                    </span>
+                    {event.closed ? (
+                      <span className="mr-4">✓ Avrapporterat</span>
+                    ) : null}
                   </span>
                 </article>
               </div>

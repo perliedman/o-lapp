@@ -97,14 +97,7 @@ function ReportBody({ group, eventId, event, members, attendance }) {
         <Button>Återöppna</Button>
       ) : mailBody ? (
         <a
-          onClick={() =>
-            dispatchEvent(database, user, eventId, {
-              type: "CLOSE_EVENT",
-              createdAt: +new Date(),
-              createdBy: user.uid,
-              createdByName: user.displayName,
-            })
-          }
+          onClick={closeEvent}
           href={`mailto:robert.jerkstrand@toleredutby.se?subject=${encodeURIComponent(
             "Närvarorapport " + event.name
           )}&body=${encodeURIComponent(mailBody)}`}
@@ -137,4 +130,16 @@ function ReportBody({ group, eventId, event, members, attendance }) {
       </div>
     </div>
   );
+
+  function closeEvent() {
+    dispatchEvent(database, user, eventId, {
+      type: "CLOSE_EVENT",
+      createdAt: +new Date(),
+      createdBy: user.uid,
+      createdByName: user.displayName,
+    });
+
+    const eventClosedRef = database.ref(`events/${eventId}/closed`);
+    eventClosedRef.set(true);
+  }
 }

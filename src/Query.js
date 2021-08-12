@@ -62,7 +62,9 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
     };
   }, [database, path, join]);
 
-  return state !== "idle" || !value ? (
+  const valueMissing = state !== "idle" || (!value && !acceptEmpty);
+
+  return valueMissing ? (
     <div className="content">
       {state === "loading" ? (
         <Spinner className="text-gray-400" />

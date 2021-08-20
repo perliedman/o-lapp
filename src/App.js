@@ -89,11 +89,19 @@ function GroupsView({ groups }) {
         <div className="box-group">
           {Object.keys(groups).map((groupId) => (
             <div key={groupId} className="box">
-              <Link to={`/group/${groupId}`}>
+              {groups[groupId] ? (
+                <Link to={`/group/${groupId}`} disabled={groups[groupId]}>
+                  <article>
+                    <h2 className="title">{groups[groupId].name}</h2>
+                  </article>
+                </Link>
+              ) : (
                 <article>
-                  <h2 className="title">{groups[groupId].name}</h2>
+                  <h2 className="title text-gray-400">
+                    Okänd grupp ({groupId})
+                  </h2>
                 </article>
-              </Link>
+              )}
             </div>
           ))}
         </div>

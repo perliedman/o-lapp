@@ -19,6 +19,7 @@ import Breadcrumbs from "./breadcrumbs";
 import Report from "./Report";
 import "./App.css";
 import Button from "./ui/Button";
+import { ErrorBoundary } from "react-error-boundary";
 
 function App() {
   return (
@@ -28,14 +29,16 @@ function App() {
 
         <section>
           <div className="container">
-            <Switch>
-              <Route path="/event/:eventId/report" component={ReportView} />
-              <Route path="/event/:eventId" component={EventView} />
-              <Route path="/group/:groupId/event/new" component={NewEvent} />
-              <Route path="/group/:groupId" component={GroupView} />
-              <Route path="/signin" component={SignIn} />
-              <Route path="/" component={StartView} />
-            </Switch>
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Switch>
+                <Route path="/event/:eventId/report" component={ReportView} />
+                <Route path="/event/:eventId" component={EventView} />
+                <Route path="/group/:groupId/event/new" component={NewEvent} />
+                <Route path="/group/:groupId" component={GroupView} />
+                <Route path="/signin" component={SignIn} />
+                <Route path="/" component={StartView} />
+              </Switch>
+            </ErrorBoundary>
           </div>
         </section>
       </Router>
@@ -253,6 +256,23 @@ function NewEvent({
       setRedirect(`/group/${groupId}/event/${eventRef.key}`)
     );
   }
+}
+
+function ErrorFallback({ error }) {
+  return (
+    <section className="content">
+      <h1 className="text-xl font-bold">Åh nej 😢</h1>
+      <p>Tyvärr har något gått snett.</p>
+      <p>
+        Försök att ladda om sidan och pröva igen. Om felet håller i sig,
+        kontakta{" "}
+        <a href="mailto:per@liedman.net" className="text-sky-900">
+          Per Liedman
+        </a>
+        .
+      </p>
+    </section>
+  );
 }
 
 export default App;

@@ -20,29 +20,38 @@ export default function Events({ group, groupId }) {
 
         return (
           <div className="box-group">
-            {sortedEvents.map((event) => (
-              <div key={event.id} className="box">
-                <article>
-                  <Link to={`/event/${event.id}`}>
-                    <h2
-                      className={`title ${event.closed ? "text-sky-200" : ""}`}
-                    >
-                      {event.name}
-                    </h2>
-                  </Link>
-                  <span className="meta flex">
-                    <span className="mr-4">
-                      {formatRelative(parseISO(event.date), new Date(), {
-                        locale: sv,
-                      })}
+            {sortedEvents.map((event) => {
+              let date;
+
+              try {
+                date = formatRelative(parseISO(event.date), new Date(), {
+                  locale: sv,
+                });
+              } catch (e) {
+                date = "[okänt datum]";
+              }
+              return (
+                <div key={event.id} className="box">
+                  <article>
+                    <Link to={`/event/${event.id}`}>
+                      <h2
+                        className={`title ${
+                          event.closed ? "text-sky-200" : ""
+                        }`}
+                      >
+                        {event.name || "[ej namngivet]"}
+                      </h2>
+                    </Link>
+                    <span className="meta flex">
+                      <span className="mr-4">{date}</span>
+                      {event.closed ? (
+                        <span className="mr-4">✓ Avrapporterat</span>
+                      ) : null}
                     </span>
-                    {event.closed ? (
-                      <span className="mr-4">✓ Avrapporterat</span>
-                    ) : null}
-                  </span>
-                </article>
-              </div>
-            ))}
+                  </article>
+                </div>
+              );
+            })}
           </div>
         );
       }}

@@ -20,6 +20,7 @@ import Report from "./Report";
 import "./App.css";
 import Button from "./ui/Button";
 import { ErrorBoundary } from "react-error-boundary";
+import { parseISO } from "date-fns";
 
 function App() {
   return (
@@ -184,6 +185,7 @@ function NewEvent({
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [redirect, setRedirect] = useState();
+  const [error, setError] = useState();
 
   return redirect ? (
     <Redirect to={redirect} />
@@ -200,6 +202,7 @@ function NewEvent({
             />
           </div>
           <form onSubmit={onSubmit}>
+            {error && <div className="field">{error}</div>}
             <div className="field">
               <label className="label">Namn</label>
               <input
@@ -240,21 +243,30 @@ function NewEvent({
   function onSubmit(event) {
     event.preventDefault();
 
-    const eventsRef = database.ref(`/events`);
-    const eventRef = eventsRef.push();
-    const createEvent = eventRef.set({
-      name: eventName,
-      date: eventDate,
-      groupId,
-    });
-    const groupEventRef = database.ref(
-      `/groups/${groupId}/events/${eventRef.key}`
-    );
-    const setGroupEvent = groupEventRef.set(true);
+    let parsedDate;
+    try {
+      parsedDate = parseISO(eventDate);
+    } catch {}
 
-    Promise.all([createEvent, setGroupEvent]).then(() =>
-      setRedirect(`/group/${groupId}/event/${eventRef.key}`)
-    );
+    if (eventName && parsedDate) {
+      const eventsRef = database.ref(`/events`);
+      const eventRef = eventsRef.push();
+      const createEvent = eventRef.set({
+        name: eventName,
+        date: eventDate,
+        groupId,
+      });
+      const groupEventRef = database.ref(
+        `/groups/${groupId}/events/${eventRef.key}`
+      );
+      const setGroupEvent = groupEventRef.set(true);
+
+      Promise.all([createEvent, setGroupEvent]).then(() =>
+        setRedirect(`/group/${groupId}/event/${eventRef.key}`)
+      );
+    } else {
+      setError("Ange både ett namn och ett datum.");
+    }
   }
 }
 

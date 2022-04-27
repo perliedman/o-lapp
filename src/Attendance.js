@@ -212,7 +212,7 @@ function AttendanceRow({
       }
     >
       <td onClick={onNameClicked}>{member.name}</td>
-      <td>
+      <td className="text-center">
         <input
           type="checkbox"
           checked={state.attending}
@@ -225,7 +225,7 @@ function AttendanceRow({
           }
         />
       </td>
-      <td>
+      <td className="text-center">
         <input
           type="checkbox"
           checked={state.attending && state.returned}

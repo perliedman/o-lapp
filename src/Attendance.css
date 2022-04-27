@@ -18,3 +18,7 @@ td {
 .attendance-table th {
   @apply text-left;
 }
+
+.attendance-table input {
+  @apply w-6 h-6;
+}

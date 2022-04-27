@@ -21,6 +21,7 @@ import "./App.css";
 import Button from "./ui/Button";
 import { ErrorBoundary } from "react-error-boundary";
 import { parseISO } from "date-fns";
+import { Admin, AdminUser } from "./Admin";
 
 function App() {
   return (
@@ -32,6 +33,8 @@ function App() {
           <div className="container">
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <Switch>
+                <Route path="/admin/users/:userId" component={AdminUser} />
+                <Route path="/admin" component={Admin} />
                 <Route path="/event/:eventId/report" component={ReportView} />
                 <Route path="/event/:eventId" component={EventView} />
                 <Route path="/group/:groupId/event/new" component={NewEvent} />
@@ -91,23 +94,26 @@ function GroupsView({ groups }) {
       </div>
       <div className="content">
         <div className="box-group">
-          {Object.keys(groups).map((groupId) => (
-            <div key={groupId} className="box">
-              {groups[groupId] ? (
-                <Link to={`/group/${groupId}`} disabled={groups[groupId]}>
-                  <article>
-                    <h2 className="title">{groups[groupId].name}</h2>
-                  </article>
-                </Link>
-              ) : (
-                <article>
-                  <h2 className="title text-gray-400">
-                    Okänd grupp ({groupId})
-                  </h2>
-                </article>
-              )}
-            </div>
-          ))}
+          {Object.keys(groups).map(
+            (groupId) =>
+              groups[groupId] && (
+                <div key={groupId} className="box">
+                  {groups[groupId] ? (
+                    <Link to={`/group/${groupId}`} disabled={groups[groupId]}>
+                      <article>
+                        <h2 className="title">{groups[groupId].name}</h2>
+                      </article>
+                    </Link>
+                  ) : (
+                    <article>
+                      <h2 className="title text-gray-400">
+                        Okänd grupp ({groupId})
+                      </h2>
+                    </article>
+                  )}
+                </div>
+              )
+          )}
         </div>
       </div>
     </>

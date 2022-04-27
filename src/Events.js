@@ -3,6 +3,7 @@ import Query from "./Query";
 import { Link } from "react-router-dom";
 import { formatRelative, parseISO } from "date-fns";
 import { sv } from "date-fns/locale";
+import compare from "trivial-compare";
 
 export default function Events({ group, groupId }) {
   return (
@@ -16,7 +17,15 @@ export default function Events({ group, groupId }) {
             ...events[id],
             id,
           }))
-          .sort((a, b) => cmp(b.date, a.date));
+          .sort((a, b) =>
+            a.date && b.date
+              ? compare(b.date, a.date)
+              : a.date
+              ? -1
+              : b.date
+              ? 1
+              : 0
+          );
 
         return (
           <div className="box-group">
@@ -26,7 +35,7 @@ export default function Events({ group, groupId }) {
               try {
                 date = formatRelative(parseISO(event.date), new Date(), {
                   locale: sv,
-                });
+                }).replace(/ kl\..*/i, "");
               } catch (e) {
                 date = "[okänt datum]";
               }
@@ -57,8 +66,4 @@ export default function Events({ group, groupId }) {
       }}
     </Query>
   );
-}
-
-function cmp(a, b) {
-  return a < b ? -1 : a > b ? 1 : 0;
 }

@@ -11904,6 +11904,11 @@ tr46@^2.1.0:
   dependencies:
     punycode "^2.1.1"
 
+trivial-compare@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/trivial-compare/-/trivial-compare-1.0.1.tgz#07bf511d45fcd9fa325af3237f1f0e0664a6516a"
+  integrity sha512-W8MEVRIw0qdOkpbAJ2OZyWN0WEhHpDSA2DO4udEp/qSckUxpYwZvF3Yfb/YQQ0rC266CLbTJDSd529CZjo2xkQ==
+
 tryer@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/tryer/-/tryer-1.0.1.tgz#f2c85406800b9b0f74c9f7465b81eaad241252f8"

@@ -41,7 +41,11 @@ export default function Report({ eventId }) {
                     join={(memberKey) => `members/${memberKey}`}
                   >
                     {(members) => (
-                      <Query path={`attendance/${eventId}`} acceptEmpty={true}>
+                      <Query
+                        path={`attendance/${eventId}`}
+                        acceptEmpty={true}
+                        debounceMs={0}
+                      >
                         {(attendance) => (
                           <section className="content">
                             {" "}

@@ -3,7 +3,14 @@ import { store } from "./store";
 import Spinner from "./ui/Spinner";
 import useDebounce from "./useDebounce";
 
-export default function Query({ path, children, join, acceptEmpty, empty }) {
+export default function Query({
+  path,
+  children,
+  join,
+  acceptEmpty,
+  empty,
+  debounceMs = 200,
+}) {
   const [state, setState] = useState("idle");
   const [value, setValue] = useState();
   const [key, setKey] = useState();
@@ -63,7 +70,7 @@ export default function Query({ path, children, join, acceptEmpty, empty }) {
     };
   }, [database, path, join]);
 
-  const debouncedValue = useDebounce(value, 500);
+  const debouncedValue = useDebounce(value, debounceMs);
   const valueMissing = state !== "idle" || (!debouncedValue && !acceptEmpty);
 
   return valueMissing ? (

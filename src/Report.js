@@ -1,4 +1,11 @@
-import React, { useMemo, useCallback, useState, useContext } from "react";
+import React, {
+  useMemo,
+  useCallback,
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import Query from "./Query";
 import Breadcrumbs from "./breadcrumbs";
 import { reduceAttendanceEvents, dispatchEvent } from "./attendance-state";
@@ -65,18 +72,19 @@ function ReportBody({ group, eventId, event, members, attendance }) {
     state: { database, user },
   } = useContext(store);
   const [mailBody, setMailBody] = useState();
-  const containerRef = useCallback((node) => {
-    if (node) {
-      // I can't see any good reason innerText should *ever*
-      // contain HTML tags, but after iOS upgrade around june 2021,
-      // some clients started generating mails with "<BR>" as line
-      // breaks. Try to work around this.
-      const body = node.innerText
-        .replace(/<br>/gi, "\n")
-        .replace(/\n/g, "\r\n");
+  const containerRef = useRef();
+  useEffect(() => {
+    // I can't see any good reason innerText should *ever*
+    // contain HTML tags, but after iOS upgrade around june 2021,
+    // some clients started generating mails with "<BR>" as line
+    // breaks. Try to work around this.
+    const body = containerRef.current.innerText
+      .replace(/<br>/gi, "\n")
+      .replace(/\n/g, "\r\n");
+    if (body !== mailBody) {
       setMailBody(body);
     }
-  }, []);
+  });
   const memberKeys = Object.keys(members);
   const state = reduceAttendanceEvents(memberKeys, attendance);
   const sortedMembers = useMemo(() => {

@@ -4,7 +4,7 @@ Attendance reporting for orienteering.
 
 The problem: when training orienteering, you want to both check who attended the training, but also make sure they returned after the training. o-lapp solves this.
 
-This simple web-app has been "in production" at Tolereds AIK for about two years.
+This simple web-app has been "in production" at Tolereds AIK for several years.
 
 o-lapp is currently a "one-off" project, and documentation is a bit scarce. Don't hesitate to contact me if you are interested in setting up and using o-lapp, I will do my best to help!
 

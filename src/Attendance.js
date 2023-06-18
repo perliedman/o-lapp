@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useState } from "react";
 import Query from "./Query";
 import { store } from "./store";
-import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faPhone, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { reduceAttendanceEvents, dispatchEvent } from "./attendance-state";
@@ -215,7 +215,7 @@ function AttendanceRow({
           : {}
       }
     >
-      <td onClick={onNameClicked}>{member.name}</td>
+      <td><button className="text-sky-900" onClick={onNameClicked}>{member.name}</button></td>
       <td className="text-center">
         <input
           type="checkbox"
@@ -250,30 +250,27 @@ function MemberInfoModal({ member, onClose }) {
   const guardians = Object.values(member.guardians || {});
 
   return (
-    <div className="modal is-active">
-      <div className="modal-background"></div>
-      <div className="modal-content">
+    <div className="fixed inset-0 bg-white z-10">
         <div className="box">
           {[member, ...guardians].map((p) => (
             <>
               <h2>{p.name}</h2>
               <p>
                 <FontAwesomeIcon icon={faPhone} />
-                &nbsp;<a href={`tel:${p.phone}`}>{p.phone || "-"}</a>
+                &nbsp;<a href={`tel:${p.phone}`} className="text-sky-900">{(p.phone !== '0' && p.phone) || "-"}</a>
               </p>
               <p>
                 <FontAwesomeIcon icon={faEnvelope} />
-                &nbsp;<a href={`mailto:${p.email}`}>{p.email || "-"}</a>
+                &nbsp;<a href={`mailto:${p.email}`} className="text-sky-900">{p.email || "-"}</a>
               </p>
             </>
           ))}
           <button
-            className="modal-close is-large"
+            className="absolute top-0 right-0 p-2 text-2xl text-sky-900"
             aria-label="close"
             onClick={onClose}
-          ></button>
+          ><FontAwesomeIcon icon={faTimes}/></button>
         </div>
-      </div>
     </div>
   );
 }

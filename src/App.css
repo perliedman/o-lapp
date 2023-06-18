@@ -7,7 +7,7 @@
 }
 
 .box {
-  @apply border border-gray-200 p-4 text-sky-900 rounded-md bg-white;
+  @apply border border-gray-200 p-4 rounded-md bg-white;
 }
 
 .box-group .box {

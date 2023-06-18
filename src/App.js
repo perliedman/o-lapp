@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -22,6 +22,7 @@ import Button from "./ui/Button";
 import { ErrorBoundary } from "react-error-boundary";
 import { parseISO } from "date-fns";
 import { Admin, AdminUser } from "./Admin";
+import Spinner from "./ui/Spinner";
 
 function App() {
   return (
@@ -54,26 +55,26 @@ function StartView() {
   const {
     state: { user },
   } = useContext(store);
+  const [wait, setWait] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setWait(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return user ? (
     <Query
       path={`/users/${user.uid}/groups`}
       join={(groupId) => `/groups/${groupId}`}
+      empty={<section className="content">
+      Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa
+      dig med det!
+    </section>}
     >
       {(groups) => {
-        const groupIds = Object.keys(groups);
-
-        return groupIds.length > 0 ? (
-          <GroupsView groups={groups} />
-        ) : (
-          <section className="content">
-            Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa
-            dig med det!
-          </section>
-        );
+        return <GroupsView groups={groups} />
       }}
     </Query>
-  ) : (
+  ) : wait ? <Spinner /> :(
     <section className="content">
       <p>Logga in för att hantera närvaro.</p>
       <p>Första gången du loggar in behöver du registrera din användare.</p>

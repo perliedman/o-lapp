@@ -11,7 +11,7 @@ export default function Query({
   empty,
   debounceMs = 200,
 }) {
-  const [state, setState] = useState("idle");
+  const [state, setState] = useState("loading");
   const [value, setValue] = useState();
   const [key, setKey] = useState();
   const valueRef = useRef();
@@ -20,6 +20,8 @@ export default function Query({
   const {
     state: { database },
   } = useContext(store);
+
+  const waitTimer = useRef();
 
   useEffect(() => {
     const ref = database.ref(path);
@@ -42,7 +44,8 @@ export default function Query({
       );
     } else {
       setValue({});
-      ref.once("value", () => setState("idle"), onError);
+      ref.once("value", () => {
+        waitTimer.current = setTimeout(() => setState("idle"), debounceMs)}, onError);
       ref.on(
         "child_added",
         (snapshot) => {
@@ -57,6 +60,8 @@ export default function Query({
               setValue(valueRef.current);
               setKey((keyRef.current || []).concat(joinSnapshot.key));
               setState("idle");
+              clearTimeout(waitTimer.current);
+              waitTimer.current = undefined
             },
             onError
           );

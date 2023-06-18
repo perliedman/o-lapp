@@ -20,7 +20,7 @@ import Report from "./Report";
 import "./App.css";
 import Button from "./ui/Button";
 import { ErrorBoundary } from "react-error-boundary";
-import { parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Admin, AdminUser } from "./Admin";
 import Spinner from "./ui/Spinner";
 
@@ -192,7 +192,7 @@ function NewEvent({
   } = useContext(store);
 
   const [eventName, setEventName] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [eventDate, setEventDate] = useState(() =>format(new Date(), "yyyy-MM-dd"));
   const [redirect, setRedirect] = useState();
   const [error, setError] = useState();
 

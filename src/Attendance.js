@@ -215,7 +215,7 @@ function AttendanceRow({
           : {}
       }
     >
-      <td><button className="text-sky-900" onClick={onNameClicked}>{member.name}</button></td>
+      <td><button className="text-left text-blue-700" onClick={onNameClicked}>{member.name}</button></td>
       <td className="text-center">
         <input
           type="checkbox"
@@ -257,16 +257,16 @@ function MemberInfoModal({ member, onClose }) {
               <h2>{p.name}</h2>
               <p>
                 <FontAwesomeIcon icon={faPhone} />
-                &nbsp;<a href={`tel:${p.phone}`} className="text-sky-900">{(p.phone !== '0' && p.phone) || "-"}</a>
+                &nbsp;<a href={`tel:${p.phone}`} className="text-blue-700">{(p.phone !== '0' && p.phone) || "-"}</a>
               </p>
               <p>
                 <FontAwesomeIcon icon={faEnvelope} />
-                &nbsp;<a href={`mailto:${p.email}`} className="text-sky-900">{p.email || "-"}</a>
+                &nbsp;<a href={`mailto:${p.email}`} className="text-blue-700">{p.email || "-"}</a>
               </p>
             </>
           ))}
           <button
-            className="absolute top-0 right-0 p-2 text-2xl text-sky-900"
+            className="absolute top-0 right-0 p-2 text-2xl text-blue-700"
             aria-label="close"
             onClick={onClose}
           ><FontAwesomeIcon icon={faTimes}/></button>

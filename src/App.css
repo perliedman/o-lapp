@@ -15,11 +15,11 @@
 }
 
 .button {
-  @apply border border-sky-600 rounded-md p-2;
+  @apply border border-blue-600 rounded-md p-2;
 }
 
 .button.active {
-  @apply bg-sky-900 text-white;
+  @apply bg-blue-700 text-white;
 }
 
 .button-group .button {

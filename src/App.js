@@ -234,7 +234,7 @@ function NewEvent({
             </div>
             <div className="actions mr-4">
               <Button
-                className="bg-sky-900 text-white mr-2"
+                className="bg-blue-700 text-white mr-2"
                 disabled={!eventName || !eventDate}
               >
                 Spara
@@ -287,7 +287,7 @@ function ErrorFallback({ error }) {
       <p>
         Försök att ladda om sidan och pröva igen. Om felet håller i sig,
         kontakta{" "}
-        <a href="mailto:per@liedman.net" className="text-sky-900">
+        <a href="mailto:per@liedman.net" className="text-blue-700">
           Per Liedman
         </a>
         .

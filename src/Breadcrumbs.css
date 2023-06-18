@@ -1,5 +1,5 @@
 .breadcrumb {
-  @apply ml-2 text-sm text-sky-200;
+  @apply ml-2 text-sm text-blue-200;
 }
 
 .breadcrumb ul {

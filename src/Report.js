@@ -113,7 +113,7 @@ function ReportBody({ group, eventId, event, members, attendance }) {
           href={`mailto:robert.jerkstrand@toleredutby.se?subject=${encodeURIComponent(
             "Närvarorapport " + event.name
           )}&body=${encodeURIComponent(mailBody)}`}
-          className="is-pulled-right button bg-sky-900 text-white"
+          className="is-pulled-right button bg-blue-700 text-white"
         >
           Maila rapport
         </a>

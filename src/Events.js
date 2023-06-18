@@ -45,7 +45,7 @@ export default function Events({ group, groupId }) {
                     <Link to={`/event/${event.id}`}>
                       <h2
                         className={`title ${
-                          event.closed ? "text-sky-200" : ""
+                          event.closed ? "text-blue-200" : ""
                         }`}
                       >
                         {event.name || "[ej namngivet]"}

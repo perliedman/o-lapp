@@ -31,7 +31,7 @@ function App() {
         <Navbar />
 
         <section>
-          <div className="container">
+          <div className="container text-gray-700">
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <Switch>
                 <Route path="/admin/users/:userId" component={AdminUser} />

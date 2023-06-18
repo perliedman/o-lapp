@@ -11,6 +11,29 @@ export default function Query({
   empty,
   debounceMs = 200,
 }) {
+  const {key, state, value, debouncedValue} = useQuery({path, join, debounceMs});
+  const valueMissing = state !== "idle" || (!debouncedValue && !acceptEmpty);
+
+  return valueMissing ? (
+    <div className="content">
+      {state === "loading" ? (
+        <Spinner className="text-gray-400" />
+      ) : state === "error" ? (
+        "Ett fel inträffade :("
+      ) : !value ? (
+        !acceptEmpty ? (
+          empty || "Här är det tomt än så länge!"
+        ) : null
+      ) : (
+        <Spinner className="text-gray-400" />
+      )}
+    </div>
+  ) : (
+    children(debouncedValue, key)
+  );
+}
+
+export function useQuery({path, join, debounceMs = 200}) {
   const [state, setState] = useState("loading");
   const [value, setValue] = useState();
   const [key, setKey] = useState();
@@ -73,26 +96,13 @@ export default function Query({
     return () => {
       ref.off();
     };
-  }, [database, path, join]);
+  }, [database, path, join, debounceMs]);
 
   const debouncedValue = useDebounce(value, debounceMs);
-  const valueMissing = state !== "idle" || (!debouncedValue && !acceptEmpty);
-
-  return valueMissing ? (
-    <div className="content">
-      {state === "loading" ? (
-        <Spinner className="text-gray-400" />
-      ) : state === "error" ? (
-        "Ett fel inträffade :("
-      ) : !value ? (
-        !acceptEmpty ? (
-          empty || "Här är det tomt än så länge!"
-        ) : null
-      ) : (
-        <Spinner className="text-gray-400" />
-      )}
-    </div>
-  ) : (
-    children(debouncedValue, key)
-  );
+  return {
+    state,
+    value,
+    debouncedValue,
+    key,
+  }
 }

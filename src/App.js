@@ -51,6 +51,8 @@ function App() {
   );
 }
 
+const groupJoin = (groupId) => `/groups/${groupId}`
+
 function StartView() {
   const {
     state: { user },
@@ -64,7 +66,7 @@ function StartView() {
   return user ? (
     <Query
       path={`/users/${user.uid}/groups`}
-      join={(groupId) => `/groups/${groupId}`}
+      join={groupJoin}
       empty={<section className="content">
       Du är inte medlem i någon grupp ännu. Kontakta någon som kan hjälpa
       dig med det!

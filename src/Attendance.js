@@ -10,6 +10,8 @@ import { sv } from "date-fns/locale";
 import "./Attendance.css";
 import Button from "./ui/Button";
 
+const memberJoin = (memberKey) => `members/${memberKey}`
+
 export default function Attendance({ groupId, eventId }) {
   const {
     state: { database, user, sort },
@@ -20,7 +22,7 @@ export default function Attendance({ groupId, eventId }) {
   return (
     <Query
       path={`groups/${groupId}/members`}
-      join={(memberKey) => `members/${memberKey}`}
+      join={memberJoin}
     >
       {(members) => (
         <Query path={`attendance/${eventId}`} acceptEmpty={true}>
@@ -89,6 +91,11 @@ export default function Attendance({ groupId, eventId }) {
   }
 }
 
+const sortOptions = [
+  ["Närvaro", "attendance"],
+  ["Kvar i skogen", "not_returned"],
+]
+
 function AttendanceTable({
   attendance,
   members,
@@ -148,10 +155,7 @@ function AttendanceTable({
         ) : null}
       </div>
       <div className="button-group mb-2">
-        {[
-          ["Närvaro", "attendance"],
-          ["Kvar i skogen", "not_returned"],
-        ].map(([label, m]) => (
+        {sortOptions.map(([label, m]) => (
           <Button
             key={m}
             onClick={(e) => {

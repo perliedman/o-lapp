@@ -25,3 +25,7 @@ yarn-error.log*
 /src/config.js
 
 admin-key.json
+tools/.env
+
+.firebase
+.firebaserc

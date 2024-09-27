@@ -1,6 +1,6 @@
 const admin = require("firebase-admin");
 const { google } = require("googleapis");
-require('dotenv').config()
+require("dotenv").config();
 
 const CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const client = google.auth.fromJSON(CREDENTIALS);
@@ -15,6 +15,8 @@ admin.initializeApp({
 
 const stats = { nMembers: 0, nGroups: 0 };
 const database = admin.database();
+
+const blacklistedNames = ["Robert Jerkstrand", "Eive Jerkstrand"];
 
 findSettingsFolderId()
   .then((folderId) => listSpreadsheets(folderId))
@@ -60,14 +62,24 @@ findSettingsFolderId()
                     : { name: groupName, members: {} };
                 }
 
-                groupMembers[groupRef.key].members[id] = true;
-
                 const memberGroups = (members[id] && members[id].groups) || {};
                 memberGroups[groupRef.key] = true;
 
+                const memberProps = colsToMember(cols);
+                if (blacklistedNames.includes(memberProps.name)) {
+                  console.log(
+                    `Blacklisted member: ${memberProps.name} for ${groupName}`
+                  );
+                  delete members[id];
+                  membersRef.child(id).remove(awaitCb());
+                  return;
+                }
+
+                groupMembers[groupRef.key].members[id] = true;
+
                 members[id] = {
                   ...members[id],
-                  ...colsToMember(cols),
+                  ...memberProps,
                   guardians: {},
                   groups: memberGroups,
                 };

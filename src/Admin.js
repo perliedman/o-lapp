@@ -56,13 +56,13 @@ export function AdminUser({
                   {Array.from(
                     new Set([
                       ...Object.keys(groups),
-                      ...Object.keys(user.groups),
+                      ...(user.groups ? Object.keys(user.groups) : []),
                     ])
                   ).map((groupId) => (
                     <div key={groupId}>
                       <input
                         type="checkbox"
-                        checked={user.groups[groupId]}
+                        checked={user.groups?.[groupId]}
                         onChange={(e) => setMember(groupId, e.target.checked)}
                         className="w-6 h-6"
                       />
